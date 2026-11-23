@@ -32,21 +32,33 @@ export interface TerminalProps {
   onReady?: (terminal: Xterm) => void;
   onResize?: (size: TerminalSize) => void;
   readOnly?: boolean;
+  /** Return false to skip xterm.js handling of this keyboard event. */
+  shouldHandleKeyEvent?: (event: KeyboardEvent) => boolean;
 }
 
 export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Terminal(
-  { appearance, autoFit = false, className, copyOnSelect = false, onData, onReady, onResize, readOnly = false },
+  {
+    appearance,
+    autoFit = false,
+    className,
+    copyOnSelect = false,
+    onData,
+    onReady,
+    onResize,
+    readOnly = false,
+    shouldHandleKeyEvent,
+  },
   ref,
 ) {
   const container = useRef<HTMLDivElement>(null);
   const instance = useRef<Xterm | null>(null);
   const defaultAppearance = useRef<Required<TerminalAppearance> | null>(null);
   const requestFit = useRef<(() => void) | null>(null);
-  const settings = useRef({ appearance, onData, onReady, onResize, readOnly });
+  const settings = useRef({ appearance, onData, onReady, onResize, readOnly, shouldHandleKeyEvent });
 
   useLayoutEffect(() => {
     const previous = settings.current;
-    settings.current = { appearance, onData, onReady, onResize, readOnly };
+    settings.current = { appearance, onData, onReady, onResize, readOnly, shouldHandleKeyEvent };
 
     const terminal = instance.current;
     const defaults = defaultAppearance.current;
@@ -64,7 +76,7 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     }
     if (previous.readOnly !== readOnly) terminal.options.disableStdin = readOnly;
     if (fontChanged || sizeChanged) requestFit.current?.();
-  }, [appearance, onData, onReady, onResize, readOnly]);
+  }, [appearance, onData, onReady, onResize, readOnly, shouldHandleKeyEvent]);
 
   useImperativeHandle(ref, () => ({
     write(data, callback) {
@@ -105,6 +117,7 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     try {
       if (settings.current.appearance) terminal.options = settings.current.appearance;
       terminal.open(element);
+      terminal.attachCustomKeyEventHandler((event) => settings.current.shouldHandleKeyEvent?.(event) ?? true);
       instance.current = terminal;
       settings.current.onReady?.(terminal);
     } catch (error) {
