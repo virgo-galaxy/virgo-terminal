@@ -121,6 +121,7 @@ type View = 'terminal' | 'logs' | 'shell';
 
 function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
   const [view, setView] = useState<View>('terminal');
+  const [hasOpenedShell, setHasOpenedShell] = useState(false);
   const [font, setFont] = useState(initialFont);
   const [fontSize, setFontSize] = useState(String(defaultFontSize));
   const [theme, setTheme] = useState<keyof typeof themes>('classic');
@@ -135,7 +136,10 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
           variant="soft"
           motion="slide"
           value={view}
-          onValueChange={(value) => setView(value as View)}
+          onValueChange={(value) => {
+            setView(value as View);
+            if (value === 'shell') setHasOpenedShell(true);
+          }}
         >
           <SegmentedControl.Item value="terminal">Terminal</SegmentedControl.Item>
           <SegmentedControl.Item value="logs">Simulated logs</SegmentedControl.Item>
@@ -192,7 +196,9 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
       <main className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
         {view === 'terminal' && <InteractiveTerminal appearance={appearance} />}
         {view === 'logs' && <SimulatedLogs appearance={appearance} />}
-        {import.meta.env.DEV && view === 'shell' && <LocalShell appearance={appearance} />}
+        {import.meta.env.DEV && hasOpenedShell && (
+          <LocalShell appearance={appearance} visible={view === 'shell'} />
+        )}
       </main>
     </>
   );

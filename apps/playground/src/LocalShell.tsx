@@ -7,7 +7,7 @@ function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
   }
 }
 
-export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
+export function LocalShell({ appearance, visible }: { appearance: TerminalAppearance; visible: boolean }) {
   const terminal = useRef<TerminalHandle>(null);
   const [ready, setReady] = useState(false);
   const socket = useRef<WebSocket | null>(null);
@@ -23,7 +23,6 @@ export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
     connection.onopen = () => {
       const size = terminal.current?.getSize();
       if (size) sendSize(connection, size);
-      terminal.current?.focus();
     };
     connection.onmessage = (event) => {
       if (typeof event.data === 'string') terminal.current?.write(event.data);
@@ -44,20 +43,26 @@ export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
     };
   }, [ready]);
 
+  useEffect(() => {
+    if (ready && visible) terminal.current?.focus();
+  }, [ready, visible]);
+
   return (
-    <Terminal
-      appearance={{ ...appearance, cursorBlink: true }}
-      autoFit
-      className="terminal"
-      ref={terminal}
-      onResize={(size) => sendSize(socket.current, size)}
-      onReady={() => setReady(true)}
-      onData={(data) => {
-        const connection = socket.current;
-        if (connection?.readyState === WebSocket.OPEN) {
-          connection.send(JSON.stringify({ type: 'input', data }));
-        }
-      }}
-    />
+    <div className="terminal" hidden={!visible}>
+      <Terminal
+        appearance={{ ...appearance, cursorBlink: true }}
+        autoFit
+        className="terminal"
+        ref={terminal}
+        onResize={(size) => sendSize(socket.current, size)}
+        onReady={() => setReady(true)}
+        onData={(data) => {
+          const connection = socket.current;
+          if (connection?.readyState === WebSocket.OPEN) {
+            connection.send(JSON.stringify({ type: 'input', data }));
+          }
+        }}
+      />
+    </div>
   );
 }
