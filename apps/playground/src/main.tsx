@@ -11,10 +11,19 @@ function Playground() {
       <Terminal
         ref={terminal}
         onReady={(xterm) => {
+          xterm.options.cursorBlink = true;
           xterm.writeln('Hello Terminal');
           xterm.focus();
         }}
-        onData={(data) => terminal.current?.write(data === '\r' ? '\r\n' : data)}
+        onData={(data) => {
+          if (data === '\r') {
+            terminal.current?.write('\r\n');
+          } else if (data === '\x7f' || data === '\b') {
+            terminal.current?.write('\b \b');
+          } else {
+            terminal.current?.write(data);
+          }
+        }}
       />
     </main>
   );
