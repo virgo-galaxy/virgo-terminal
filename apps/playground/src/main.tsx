@@ -122,15 +122,38 @@ const themes = {
 } satisfies Record<string, { label: string; colors: NonNullable<TerminalAppearance['theme']> }>;
 
 type View = 'terminal' | 'logs' | 'shell';
+type ShellOption = { id: string; label: string };
+type ShellSession = { attempt: number; shellId: string };
+
+const defaultShellOption = { id: 'system', label: 'System default' };
 
 function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
   const [view, setView] = useState<View>('terminal');
-  const [hasOpenedShell, setHasOpenedShell] = useState(false);
+  const [shellSession, setShellSession] = useState<ShellSession | null>(null);
+  const [shellOptions, setShellOptions] = useState<ShellOption[]>([defaultShellOption]);
+  const [shellId, setShellId] = useState(defaultShellOption.id);
   const [font, setFont] = useState(initialFont);
   const [fontSize, setFontSize] = useState(String(defaultFontSize));
   const [theme, setTheme] = useState<keyof typeof themes>('classic');
   const [copyOnSelect, setCopyOnSelect] = useState(false);
   const appearance = { fontFamily: fonts[font].family, fontSize: Number(fontSize), theme: themes[theme].colors };
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+
+    const request = new AbortController();
+    void fetch('/local-shell/options', { signal: request.signal }).then(async (response) => {
+      if (response.ok) {
+        const options: ShellOption[] = await response.json();
+        setShellOptions(options);
+      }
+    }).catch(() => {});
+    return () => request.abort();
+  }, []);
+
+  function startShell() {
+    setShellSession((session) => ({ attempt: (session?.attempt ?? 0) + 1, shellId }));
+  }
 
   return (
     <>
@@ -143,7 +166,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
           value={view}
           onValueChange={(value) => {
             setView(value as View);
-            if (value === 'shell') setHasOpenedShell(true);
+            if (value === 'shell' && !shellSession) startShell();
           }}
         >
           <SegmentedControl.Item value="terminal">Terminal</SegmentedControl.Item>
@@ -170,7 +193,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
               <Drawer.Body className="preferences-body">
                 <section className="preferences-section" aria-labelledby="appearance-heading">
                   <h3 id="appearance-heading">Appearance</h3>
-                  <div className="appearance-field">
+                  <div className="preference-field">
                     <span id="appearance-font">Font</span>
                     <Select size="small" value={font} onValueChange={(value) => setFont(value as keyof typeof fonts)}>
                       <Select.Trigger aria-labelledby="appearance-font" />
@@ -181,7 +204,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
                       </Select.Content>
                     </Select>
                   </div>
-                  <div className="appearance-field">
+                  <div className="preference-field">
                     <span id="appearance-size">Size</span>
                     <Select size="small" value={fontSize} onValueChange={setFontSize}>
                       <Select.Trigger aria-labelledby="appearance-size" />
@@ -190,7 +213,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
                       </Select.Content>
                     </Select>
                   </div>
-                  <div className="appearance-field">
+                  <div className="preference-field">
                     <span id="appearance-theme">Theme</span>
                     <Select size="small" value={theme} onValueChange={(value) => setTheme(value as keyof typeof themes)}>
                       <Select.Trigger aria-labelledby="appearance-theme" />
@@ -208,6 +231,22 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
                   <Switch className="copy-on-select" checked={copyOnSelect} onCheckedChange={setCopyOnSelect}>
                     Copy on select
                   </Switch>
+                  {import.meta.env.DEV && (
+                    <>
+                      <div className="preference-field">
+                        <span id="local-shell-label">Shell</span>
+                        <Select size="small" value={shellId} onValueChange={setShellId}>
+                          <Select.Trigger aria-labelledby="local-shell-label" aria-describedby="local-shell-hint" />
+                          <Select.Content>
+                            {shellOptions.map(({ id, label }) => (
+                              <Select.Option key={id} value={id}>{label}</Select.Option>
+                            ))}
+                          </Select.Content>
+                        </Select>
+                      </div>
+                      <p id="local-shell-hint" className="shell-preference-hint">Applies to the next shell session.</p>
+                    </>
+                  )}
                 </section>
               </Drawer.Body>
             </Drawer.Content>
@@ -217,8 +256,15 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
       <main className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
         {view === 'terminal' && <InteractiveTerminal appearance={appearance} copyOnSelect={copyOnSelect} />}
         {view === 'logs' && <SimulatedLogs appearance={appearance} copyOnSelect={copyOnSelect} />}
-        {import.meta.env.DEV && hasOpenedShell && (
-          <LocalShell appearance={appearance} copyOnSelect={copyOnSelect} visible={view === 'shell'} />
+        {import.meta.env.DEV && shellSession && (
+          <LocalShell
+            key={shellSession.attempt}
+            appearance={appearance}
+            copyOnSelect={copyOnSelect}
+            onRestart={startShell}
+            shellId={shellSession.shellId}
+            visible={view === 'shell'}
+          />
         )}
       </main>
     </>

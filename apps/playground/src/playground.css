@@ -47,11 +47,17 @@ body {
   font-weight: var(--vd-typography-ui-title-small-font-weight);
 }
 
-.appearance-field {
+.preference-field {
   display: grid;
   grid-template-columns: 3rem minmax(0, 1fr);
   align-items: center;
   gap: var(--vd-spacing-8);
+  color: var(--vd-text-secondary);
+  font-size: var(--vd-typography-ui-label-medium-font-size);
+}
+
+.shell-preference-hint {
+  margin: 0 0 0 calc(3rem + var(--vd-spacing-8));
   color: var(--vd-text-secondary);
   font-size: var(--vd-typography-ui-label-medium-font-size);
 }
@@ -72,4 +78,20 @@ body {
 
 .terminal {
   height: 100%;
+}
+
+.local-shell:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+
+.local-shell-terminal {
+  flex: 1;
+  min-block-size: 0;
+}
+
+.local-shell-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-block-start: var(--vd-spacing-8);
 }

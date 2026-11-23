@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalAppearance, type TerminalHandle, type TerminalSize } from '@virgo-terminal/react';
 
 function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
@@ -7,13 +8,16 @@ function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
   }
 }
 
-export function LocalShell({ appearance, copyOnSelect, visible }: {
+export function LocalShell({ appearance, copyOnSelect, onRestart, shellId, visible }: {
   appearance: TerminalAppearance;
   copyOnSelect: boolean;
+  onRestart: () => void;
+  shellId: string;
   visible: boolean;
 }) {
   const terminal = useRef<TerminalHandle>(null);
   const [ready, setReady] = useState(false);
+  const [closed, setClosed] = useState(false);
   const socket = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -26,7 +30,7 @@ export function LocalShell({ appearance, copyOnSelect, visible }: {
 
     connection.onopen = () => {
       const size = terminal.current?.getSize();
-      if (size) sendSize(connection, size);
+      if (size) connection.send(JSON.stringify({ type: 'start', shellId, ...size }));
     };
     connection.onmessage = (event) => {
       if (typeof event.data === 'string') terminal.current?.write(event.data);
@@ -34,8 +38,10 @@ export function LocalShell({ appearance, copyOnSelect, visible }: {
     connection.onclose = ({ code }) => {
       let message = 'Local shell disconnected';
       if (code === 1000) message = 'Shell exited';
+      if (code === 1008) message = 'Selected shell is unavailable';
       if (code === 1011) message = 'Local shell failed';
       terminal.current?.write(`\r\n[${message}]\r\n`);
+      setClosed(true);
     };
 
     return () => {
@@ -45,18 +51,18 @@ export function LocalShell({ appearance, copyOnSelect, visible }: {
       connection.onclose = null;
       connection.close();
     };
-  }, [ready]);
+  }, [ready, shellId]);
 
   useEffect(() => {
     if (ready && visible) terminal.current?.focus();
   }, [ready, visible]);
 
   return (
-    <div className="terminal" hidden={!visible}>
+    <div className="terminal local-shell" hidden={!visible}>
       <Terminal
         appearance={{ ...appearance, cursorBlink: true }}
         autoFit
-        className="terminal"
+        className="local-shell-terminal"
         copyOnSelect={copyOnSelect}
         ref={terminal}
         onResize={(size) => sendSize(socket.current, size)}
@@ -68,6 +74,11 @@ export function LocalShell({ appearance, copyOnSelect, visible }: {
           }
         }}
       />
+      {closed && (
+        <div className="local-shell-actions">
+          <Button size="small" variant="outline" onClick={onRestart}>Start shell</Button>
+        </div>
+      )}
     </div>
   );
 }
