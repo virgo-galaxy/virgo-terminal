@@ -95,3 +95,10 @@ body {
   justify-content: flex-end;
   padding-block-start: var(--vd-spacing-8);
 }
+
+.start-shell-button {
+  --vd-brand-primary: var(--vd-status-success-solid);
+  --vd-brand-primary-hover: color-mix(in srgb, var(--vd-status-success-solid) 92%, var(--vd-status-success-foreground));
+  --vd-brand-primary-active: color-mix(in srgb, var(--vd-status-success-solid) 85%, var(--vd-status-success-foreground));
+  --vd-brand-foreground: var(--vd-status-success-on-solid);
+}

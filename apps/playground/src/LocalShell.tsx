@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { PlayFilledIcon } from '@virgo-design/icons';
 import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalAppearance, type TerminalHandle, type TerminalSize } from '@virgo-terminal/react';
 
@@ -76,7 +77,15 @@ export function LocalShell({ appearance, copyOnSelect, onRestart, shellId, visib
       />
       {closed && (
         <div className="local-shell-actions">
-          <Button size="small" variant="outline" onClick={onRestart}>Start shell</Button>
+          <Button
+            className="start-shell-button"
+            size="small"
+            variant="primary"
+            leadingIcon={<PlayFilledIcon />}
+            onClick={onRestart}
+          >
+            Start shell
+          </Button>
         </div>
       )}
     </div>
