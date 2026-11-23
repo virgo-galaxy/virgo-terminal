@@ -3,7 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import '@virgo-terminal/react/styles.css';
 
-const prompt = '$ ';
+const prompt = '[root@localhost] # ~ ';
+const loadedAt = new Date();
+const loginDate = loadedAt.toDateString().slice(0, 10);
+const loginTime = loadedAt.toTimeString().slice(0, 8);
+const loginMessage = `Last login: ${loginDate} ${loginTime} on ttys001`;
 
 function InteractiveTerminal() {
   const terminal = useRef<TerminalHandle>(null);
@@ -17,7 +21,7 @@ function InteractiveTerminal() {
       onReady={(xterm) => {
         inputLength.current = 0;
         xterm.options.cursorBlink = true;
-        xterm.write(`Hello Terminal\r\n${prompt}`);
+        xterm.write(`${loginMessage}\r\n${prompt}`);
         xterm.focus();
       }}
       onData={(data) => {
