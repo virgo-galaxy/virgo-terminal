@@ -9,6 +9,8 @@ function Playground() {
   return (
     <main>
       <Terminal
+        autoFit
+        className="terminal"
         ref={terminal}
         onReady={(xterm) => {
           xterm.options.cursorBlink = true;
