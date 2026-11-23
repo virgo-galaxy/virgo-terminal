@@ -6,6 +6,7 @@
   "packageManager": "pnpm@11.9.0",
   "engines": { "node": ">=22.13.0", "pnpm": "11.9.0" },
   "scripts": {
+    "dev": "pnpm --filter @virgo-terminal/react build && pnpm --filter @virgo-terminal/playground dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck && tsc -p tsconfig.tools.json",
     "lint": "eslint . --max-warnings 0",
