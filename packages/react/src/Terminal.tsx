@@ -18,19 +18,23 @@ export interface TerminalProps {
   className?: string;
   onData?: (data: string) => void;
   onReady?: (terminal: Xterm) => void;
+  readOnly?: boolean;
 }
 
 export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Terminal(
-  { autoFit = false, className, onData, onReady },
+  { autoFit = false, className, onData, onReady, readOnly = false },
   ref,
 ) {
   const container = useRef<HTMLDivElement>(null);
   const instance = useRef<Xterm | null>(null);
-  const callbacks = useRef({ onData, onReady });
+  const settings = useRef({ onData, onReady, readOnly });
 
   useLayoutEffect(() => {
-    callbacks.current = { onData, onReady };
-  }, [onData, onReady]);
+    if (instance.current && settings.current.readOnly !== readOnly) {
+      instance.current.options.disableStdin = readOnly;
+    }
+    settings.current = { onData, onReady, readOnly };
+  }, [onData, onReady, readOnly]);
 
   useImperativeHandle(ref, () => ({
     write(data, callback) {
@@ -42,8 +46,8 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     const element = container.current;
     if (!element) return;
 
-    const terminal = new Xterm();
-    const input = terminal.onData((data) => callbacks.current.onData?.(data));
+    const terminal = new Xterm({ disableStdin: settings.current.readOnly });
+    const input = terminal.onData((data) => settings.current.onData?.(data));
 
     function dispose() {
       instance.current = null;
@@ -54,7 +58,7 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     try {
       terminal.open(element);
       instance.current = terminal;
-      callbacks.current.onReady?.(terminal);
+      settings.current.onReady?.(terminal);
     } catch (error) {
       dispose();
       throw error;
