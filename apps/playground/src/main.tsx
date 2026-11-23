@@ -3,8 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import '@virgo-terminal/react/styles.css';
 
+const prompt = '$ ';
+
 function InteractiveTerminal() {
   const terminal = useRef<TerminalHandle>(null);
+  const inputLength = useRef(0);
 
   return (
     <Terminal
@@ -12,18 +15,28 @@ function InteractiveTerminal() {
       className="terminal"
       ref={terminal}
       onReady={(xterm) => {
+        inputLength.current = 0;
         xterm.options.cursorBlink = true;
-        xterm.writeln('Hello Terminal');
+        xterm.write(`Hello Terminal\r\n${prompt}`);
         xterm.focus();
       }}
       onData={(data) => {
-        if (data === '\r') {
-          terminal.current?.write('\r\n');
-        } else if (data === '\x7f' || data === '\b') {
-          terminal.current?.write('\b \b');
-        } else {
-          terminal.current?.write(data);
+        if (data === '\x7f' || data === '\b') {
+          if (inputLength.current > 0) {
+            inputLength.current -= 1;
+            terminal.current?.write('\b \b');
+          }
+          return;
         }
+        if (data.startsWith('\x1b')) return;
+
+        const text = Array.from(data.replace(/\r\n?/g, '\n'))
+          .filter((char) => char === '\n' || (char >= ' ' && char !== '\x7f'))
+          .join('');
+        const lastNewline = text.lastIndexOf('\n');
+        if (lastNewline !== -1) inputLength.current = 0;
+        inputLength.current += Array.from(text.slice(lastNewline + 1)).length;
+        terminal.current?.write(text.replaceAll('\n', `\r\n${prompt}`));
       }}
     />
   );
