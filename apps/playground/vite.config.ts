@@ -1,5 +1,6 @@
 import { chmod, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { userInfo } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import type { IPty } from 'node-pty';
 import { defineConfig } from 'vite';
@@ -12,7 +13,8 @@ export default defineConfig({
       const http = server.httpServer;
       if (!http) return;
 
-      if (process.platform === 'darwin') {
+      const macOS = process.platform === 'darwin';
+      if (macOS) {
         // The node-pty 1.1.0 tarball omits the execute bit on its macOS helper.
         const packagePath = createRequire(import.meta.url).resolve('node-pty/package.json');
         const helper = resolve(dirname(packagePath), 'prebuilds', `darwin-${process.arch}`, 'spawn-helper');
@@ -28,6 +30,8 @@ export default defineConfig({
       const windows = process.platform === 'win32';
       const shell = windows ? process.env.ComSpec || 'cmd.exe' : process.env.SHELL || '/bin/sh';
       const shellArgs = windows ? [] : ['-l'];
+      const command = macOS ? '/usr/bin/login' : shell;
+      const args = macOS ? ['-f', '-p', '-l', userInfo().username, shell, ...shellArgs] : shellArgs;
 
       sockets.on('connection', (socket) => {
         let terminal: IPty | undefined;
@@ -59,7 +63,7 @@ export default defineConfig({
                 return;
               }
 
-              terminal = spawn(shell, shellArgs, {
+              terminal = spawn(command, args, {
                 name: 'xterm-256color', cols, rows, cwd, env: process.env,
               });
               terminal.onData((output) => {
