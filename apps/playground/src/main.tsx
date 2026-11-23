@@ -2,6 +2,7 @@ import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import '@virgo-terminal/react/styles.css';
+import { LocalShell } from './LocalShell';
 
 const prompt = '[root@localhost] # ~ ';
 const loadedAt = new Date();
@@ -82,15 +83,22 @@ function SimulatedLogs() {
 }
 
 function Playground() {
-  const [showLogs, setShowLogs] = useState(false);
+  const [view, setView] = useState<'terminal' | 'logs' | 'shell'>('terminal');
 
   return (
     <>
       <nav aria-label="Playground view">
-        <button type="button" aria-pressed={!showLogs} onClick={() => setShowLogs(false)}>Terminal</button>
-        <button type="button" aria-pressed={showLogs} onClick={() => setShowLogs(true)}>Simulated logs</button>
+        <button type="button" aria-pressed={view === 'terminal'} onClick={() => setView('terminal')}>Terminal</button>
+        <button type="button" aria-pressed={view === 'logs'} onClick={() => setView('logs')}>Simulated logs</button>
+        {import.meta.env.DEV && (
+          <button type="button" aria-pressed={view === 'shell'} onClick={() => setView('shell')}>Local Shell</button>
+        )}
       </nav>
-      <main>{showLogs ? <SimulatedLogs /> : <InteractiveTerminal />}</main>
+      <main>
+        {view === 'terminal' && <InteractiveTerminal />}
+        {view === 'logs' && <SimulatedLogs />}
+        {import.meta.env.DEV && view === 'shell' && <LocalShell />}
+      </main>
     </>
   );
 }
