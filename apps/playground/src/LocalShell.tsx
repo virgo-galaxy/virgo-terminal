@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Terminal, type TerminalProps } from '@virgo-terminal/react';
+import { Terminal, type TerminalAppearance, type TerminalProps } from '@virgo-terminal/react';
 
 type Xterm = Parameters<NonNullable<TerminalProps['onReady']>>[0];
 
-export function LocalShell() {
+export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
   const [terminal, setTerminal] = useState<Xterm | null>(null);
   const socket = useRef<WebSocket | null>(null);
 
@@ -48,6 +48,7 @@ export function LocalShell() {
 
   return (
     <Terminal
+      appearance={appearance}
       autoFit
       className="terminal"
       onReady={(xterm) => {

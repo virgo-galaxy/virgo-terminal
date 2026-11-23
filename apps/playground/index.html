@@ -8,9 +8,14 @@
       html { color-scheme: dark; }
       body { box-sizing: border-box; height: 100dvh; margin: 0; padding: 16px; background: #000; }
       #root { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; gap: 12px; }
-      main { min-width: 0; }
-      nav { display: flex; gap: 8px; }
+      header, nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+      main { min-width: 0; isolation: isolate; }
       button[aria-pressed="true"] { border-color: currentColor; }
+      .appearance { position: relative; z-index: 1; margin-inline-start: auto; font: 13px system-ui; color: #f2f2f2; }
+      .appearance summary { padding: 2px 7px; cursor: pointer; border: 1px solid #595959; border-radius: 4px; background: #252525; }
+      .appearance-options { position: absolute; inset: calc(100% + 6px) 0 auto auto; display: grid; gap: 8px; box-sizing: border-box; width: min(15rem, calc(100vw - 32px)); padding: 10px; border: 1px solid #595959; border-radius: 4px; background: #1b1b1b; }
+      .appearance-field { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: 8px; align-items: center; }
+      .appearance-options select { min-width: 0; }
       .terminal { height: 100%; }
     </style>
   </head>
