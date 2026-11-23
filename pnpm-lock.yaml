@@ -35,6 +35,21 @@ importers:
 
   apps/playground:
     dependencies:
+      '@virgo-design/fonts':
+        specifier: 0.1.0
+        version: 0.1.0
+      '@virgo-design/icons':
+        specifier: 0.1.0
+        version: 0.1.0(react@19.3.1)
+      '@virgo-design/themes':
+        specifier: 0.1.0
+        version: 0.1.0
+      '@virgo-design/tokens':
+        specifier: 0.1.0
+        version: 0.1.0
+      '@virgo-design/ui':
+        specifier: 0.1.0
+        version: 0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@virgo-terminal/react':
         specifier: workspace:*
         version: link:../../packages/react
@@ -202,6 +217,51 @@ packages:
   '@eslint/plugin-kit@0.7.3':
     resolution: {integrity: sha512-IkO+/KEUvwbVpiURZg+P7zF74z5Jxe0UgJxVni+RtoHQ6IZieXaO02kmadomap/q+l6bc/jdPGGqTjhuZnuz1Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+
+  '@fontsource-variable/figtree@5.3.0':
+    resolution: {integrity: sha512-VRVodD7OiG7apQwE8/2fMjaqpY/a0qRJqL5HtYj8CKIVps+9amaFcdfKmDIf7iqYQx6iPLlArVXAfKeIZmVcNQ==}
+
+  '@fontsource-variable/geist-mono@5.3.0':
+    resolution: {integrity: sha512-vBbuwDEo9AkrqADMXOrlAR3DFcJi4/JxeuU43FoiQERnNwsfXNnvxvReZG02cQKmyk4DZkZdBZX3oTDvy2zBAw==}
+
+  '@fontsource-variable/google-sans-code@5.3.2':
+    resolution: {integrity: sha512-kW4RcfoTTObtUWAhlh6hzs8LCDsBNLwVRPqjUIKMkEiabfR3SRGP0Y6erFKd9k1yaRppTSCLSVkxhPKpEW3QPg==}
+
+  '@fontsource-variable/ibm-plex-sans@5.3.0':
+    resolution: {integrity: sha512-agG8tXFEo0hD9+J7npa4vbbWult52eMLVaQ6WQRlhs/iCAojrMAoejru85W9HTVXHfyUj96KM7gp/KGAS87XaQ==}
+
+  '@fontsource-variable/instrument-sans@5.3.0':
+    resolution: {integrity: sha512-u4gKbDBTNFGkg997tfQn3eHOhHuquWUFTRT/rwzuKtrxX5P2ekfs2x+LgBPP4P32+cC+vUwF1Cr+IdRoPQbrGw==}
+
+  '@fontsource-variable/inter@5.3.0':
+    resolution: {integrity: sha512-OupL48va4JNofb97w6NYeF9S7W/kHNKM0Er8Dem5nqi4jeOLrVJDoE8tZEpnMJmtkvNbB1EIPPwHcdkF6b1oUA==}
+
+  '@fontsource-variable/jetbrains-mono@5.3.0':
+    resolution: {integrity: sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw==}
+
+  '@fontsource-variable/kode-mono@5.3.0':
+    resolution: {integrity: sha512-U5nNDAkv9c5jgMnom649alsS3CxlSsPM5SKSfpnWuUNDV65keYVCIZWnxf9/mFJZg6SWussoHQ6D4t//l9grQw==}
+
+  '@fontsource-variable/noto-sans-hk@5.3.1':
+    resolution: {integrity: sha512-+ScsfTTMusjsjhMthQ/3WBcpvwrRqB4SzruinoTHztb8z+NGrBjPymw3TfQNa0/D567gvbI241+sVt31qh+v9Q==}
+
+  '@fontsource-variable/noto-sans-jp@5.3.1':
+    resolution: {integrity: sha512-/anGvJFc5y36f8DJ+3TSh2+KAvaRLA9PaLUMvneeY5s4j8m+8X4F3lE/sjTuG9YI5BX4sykvCk4TuJMG7ecMRQ==}
+
+  '@fontsource-variable/noto-sans-kr@5.3.1':
+    resolution: {integrity: sha512-f5aty6Qgk2LVU5TjCtXHxiYHqUWYW8f75ll0Chn8ucCqoOlIomcACUwf1V47yUt6wTdWZiGr3dcbQk+zlOspMA==}
+
+  '@fontsource-variable/noto-sans-sc@5.3.1':
+    resolution: {integrity: sha512-UB96JJ17HyD5ehEU7Em0hDdh7fvTMB4B4Hzmq5c4QaNwwSLqTrdM2S+coySeBqCkXwh0DxqXT0b0wMrmzorFpQ==}
+
+  '@fontsource-variable/noto-sans-tc@5.3.1':
+    resolution: {integrity: sha512-gueh+AySNkihE+HvizXLHltxt5/xVFSvw6ISnKTlpb/lG5QQm6u/KwuempTJ/jDYMST3xwiERYTTyseoJ/Kxew==}
+
+  '@fontsource-variable/red-hat-mono@5.3.0':
+    resolution: {integrity: sha512-/mEvTCcruJY64xRgx1gsmsYuGR7MtOduOsuyeHVJ07p+2gGvCqROauIwaTCcVHL4eBGi+Lns4EUIjrPZLCn5gQ==}
+
+  '@fontsource-variable/source-code-pro@5.3.1':
+    resolution: {integrity: sha512-N0nZDizh8CQ19+AHHA8Ssb1i/aQf4N2lpRl3qZVH4/9f1yNgWzTkBFpc26v+QQr2hm4By4aiv597BCoEg2SDQg==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -459,6 +519,35 @@ packages:
   '@typescript-eslint/visitor-keys@8.73.0':
     resolution: {integrity: sha512-k4lsFVpRZICbltkIEEH4hZRkwXkqDF1GHBpClKQOHQY+RkoZAAuyc1ci3I6p+CB6v3U4jaHIUshc4RzzQXZWLg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@virgo-design/colors@0.1.0':
+    resolution: {integrity: sha512-H+l9rX80pjkUW8S8r5Uzb8pK7XqGtPNiknhNmXYlhekI9yn4O4sWGZvEDw1NsO/OILO52bpkxNnJthqiTUIgvw==}
+
+  '@virgo-design/fonts@0.1.0':
+    resolution: {integrity: sha512-LFRTltnXjiS8+Ip+J9FPcIEfAgl8b+ZgtLy5oZ65vUxPe8pl/Q72Q3E0URScLbsKR3LhEGEGAHHDlTeGPUMdXw==}
+
+  '@virgo-design/icons@0.1.0':
+    resolution: {integrity: sha512-7ugpRJT0RtURA/vgrFUiibEx5M0G0BjuEDv/pA1nrqeGk+s9iemwVkGuy2WuZyhlmuvMq+Zw8xceoH88vogzUg==}
+    peerDependencies:
+      react: '>=18.0.0'
+
+  '@virgo-design/primitives@0.1.0':
+    resolution: {integrity: sha512-iV2f6P1GpoSUZNe+dFwT/Zv8SWYTjO75r5hpA6NZ5yVk0xDb/WUzjV+pz1u6bW904Soq7uUi9uV8XBPcrH2NOA==}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
+  '@virgo-design/themes@0.1.0':
+    resolution: {integrity: sha512-uopNO+qCXSB9FkWAKfhe2pgG1SlaXlohGjNYVT28LZJ5T8BErF2bEyb/OS0FWXZoT9/eZpTu+cV3Twix1AN1Pg==}
+
+  '@virgo-design/tokens@0.1.0':
+    resolution: {integrity: sha512-GSdsEJzzNXEe+St5amGYHHXSWO4siKdaoY1CLThNmXBGmFXJs7A8sLJy4NxaKPqq65ZoMg8B7LnVRpdEc2RdlA==}
+
+  '@virgo-design/ui@0.1.0':
+    resolution: {integrity: sha512-WAaokQZ+vp5tgVFCdxG+vE5TBo7JnO/r1qp+sW0lFLM1iFRJI2F0qJTymuvp56OpZqZoRQB5txU8PD2n7AJnvQ==}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
 
   '@vitest/mocker@5.1.1':
     resolution: {integrity: sha512-b2OgTB4+3ImWIVafXKazJXwLKwQxUNnix6b3xUvUTMh7RyXlrtzoxfZr8aEz9zkHOMAS4K5lu3TvFWoiVeVTQg==}
@@ -1269,6 +1358,36 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
+  '@fontsource-variable/figtree@5.3.0': {}
+
+  '@fontsource-variable/geist-mono@5.3.0': {}
+
+  '@fontsource-variable/google-sans-code@5.3.2': {}
+
+  '@fontsource-variable/ibm-plex-sans@5.3.0': {}
+
+  '@fontsource-variable/instrument-sans@5.3.0': {}
+
+  '@fontsource-variable/inter@5.3.0': {}
+
+  '@fontsource-variable/jetbrains-mono@5.3.0': {}
+
+  '@fontsource-variable/kode-mono@5.3.0': {}
+
+  '@fontsource-variable/noto-sans-hk@5.3.1': {}
+
+  '@fontsource-variable/noto-sans-jp@5.3.1': {}
+
+  '@fontsource-variable/noto-sans-kr@5.3.1': {}
+
+  '@fontsource-variable/noto-sans-sc@5.3.1': {}
+
+  '@fontsource-variable/noto-sans-tc@5.3.1': {}
+
+  '@fontsource-variable/red-hat-mono@5.3.0': {}
+
+  '@fontsource-variable/source-code-pro@5.3.1': {}
+
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -1505,6 +1624,52 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.73.0
       eslint-visitor-keys: 5.0.1
+
+  '@virgo-design/colors@0.1.0': {}
+
+  '@virgo-design/fonts@0.1.0':
+    dependencies:
+      '@fontsource-variable/figtree': 5.3.0
+      '@fontsource-variable/geist-mono': 5.3.0
+      '@fontsource-variable/google-sans-code': 5.3.2
+      '@fontsource-variable/ibm-plex-sans': 5.3.0
+      '@fontsource-variable/instrument-sans': 5.3.0
+      '@fontsource-variable/inter': 5.3.0
+      '@fontsource-variable/jetbrains-mono': 5.3.0
+      '@fontsource-variable/kode-mono': 5.3.0
+      '@fontsource-variable/noto-sans-hk': 5.3.1
+      '@fontsource-variable/noto-sans-jp': 5.3.1
+      '@fontsource-variable/noto-sans-kr': 5.3.1
+      '@fontsource-variable/noto-sans-sc': 5.3.1
+      '@fontsource-variable/noto-sans-tc': 5.3.1
+      '@fontsource-variable/red-hat-mono': 5.3.0
+      '@fontsource-variable/source-code-pro': 5.3.1
+
+  '@virgo-design/icons@0.1.0(react@19.3.1)':
+    dependencies:
+      react: 19.3.1
+
+  '@virgo-design/primitives@0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+    dependencies:
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
+
+  '@virgo-design/themes@0.1.0':
+    dependencies:
+      '@virgo-design/tokens': 0.1.0
+
+  '@virgo-design/tokens@0.1.0':
+    dependencies:
+      '@virgo-design/colors': 0.1.0
+      '@virgo-design/fonts': 0.1.0
+
+  '@virgo-design/ui@0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+    dependencies:
+      '@virgo-design/icons': 0.1.0(react@19.3.1)
+      '@virgo-design/primitives': 0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@virgo-design/tokens': 0.1.0
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
 
   '@vitest/mocker@5.1.1(vite@8.3.8(@types/node@24.19.2))':
     dependencies:

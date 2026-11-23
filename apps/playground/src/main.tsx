@@ -1,7 +1,16 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { monoFonts } from '@virgo-design/fonts';
+import { ChevronDownIcon } from '@virgo-design/icons';
+import { Button, Popover, SegmentedControl, Select } from '@virgo-design/ui';
 import { Terminal, type TerminalAppearance, type TerminalHandle } from '@virgo-terminal/react';
+import '@virgo-design/fonts/sans/inter.css';
+import '@virgo-design/fonts/mono/jetbrains-mono.css';
+import '@virgo-design/tokens/styles.css';
+import '@virgo-design/themes/virgo.css';
+import '@virgo-design/ui/styles.css';
 import '@virgo-terminal/react/styles.css';
+import './playground.css';
 import { LocalShell } from './LocalShell';
 
 const prompt = '[root@localhost] # ~ ';
@@ -85,11 +94,13 @@ function SimulatedLogs({ appearance }: { appearance: TerminalAppearance }) {
 }
 
 const fonts = {
+  jetbrains: { label: monoFonts.jetbrainsMono.name, family: `${monoFonts.jetbrainsMono.cssFamily}, monospace` },
   system: { label: 'System monospace', family: 'monospace' },
   console: { label: 'Monaco / Consolas', family: 'Monaco, Consolas, monospace' },
   courier: { label: 'Courier New', family: '"Courier New", monospace' },
 };
 
+const defaultFontSize = 15;
 const sizes = [12, 14, 15, 16, 18, 20, 24];
 
 const themes = {
@@ -107,52 +118,78 @@ const themes = {
   },
 } satisfies Record<string, { label: string; colors: NonNullable<TerminalAppearance['theme']> }>;
 
-function Playground() {
-  const [view, setView] = useState<'terminal' | 'logs' | 'shell'>('terminal');
-  const [font, setFont] = useState<keyof typeof fonts>('system');
-  const [fontSize, setFontSize] = useState(15);
+type View = 'terminal' | 'logs' | 'shell';
+
+function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
+  const [view, setView] = useState<View>('terminal');
+  const [font, setFont] = useState(initialFont);
+  const [fontSize, setFontSize] = useState(String(defaultFontSize));
   const [theme, setTheme] = useState<keyof typeof themes>('classic');
-  const appearance = { fontFamily: fonts[font].family, fontSize, theme: themes[theme].colors };
+  const appearance = { fontFamily: fonts[font].family, fontSize: Number(fontSize), theme: themes[theme].colors };
 
   return (
     <>
-      <header>
-        <nav aria-label="Playground view">
-          <button type="button" aria-pressed={view === 'terminal'} onClick={() => setView('terminal')}>Terminal</button>
-          <button type="button" aria-pressed={view === 'logs'} onClick={() => setView('logs')}>Simulated logs</button>
+      <header className="toolbar">
+        <SegmentedControl
+          aria-label="Playground view"
+          size="small"
+          variant="soft"
+          value={view}
+          onValueChange={(value) => setView(value as View)}
+        >
+          <SegmentedControl.Item value="terminal">Terminal</SegmentedControl.Item>
+          <SegmentedControl.Item value="logs">Simulated logs</SegmentedControl.Item>
           {import.meta.env.DEV && (
-            <button type="button" aria-pressed={view === 'shell'} onClick={() => setView('shell')}>Local Shell</button>
+            <SegmentedControl.Item value="shell">Local Shell</SegmentedControl.Item>
           )}
-        </nav>
-        <details className="appearance" onKeyDown={(event) => {
-          if (event.key !== 'Escape' || !event.currentTarget.open) return;
-          event.currentTarget.open = false;
-          event.currentTarget.querySelector('summary')?.focus();
-        }}>
-          <summary>Appearance</summary>
-          <div className="appearance-options">
-            <div className="appearance-field">
-              <label htmlFor="appearance-font">Font</label>
-              <select id="appearance-font" value={font} onChange={(event) => setFont(event.currentTarget.value as keyof typeof fonts)}>
-                {Object.entries(fonts).map(([value, option]) => <option key={value} value={value}>{option.label}</option>)}
-              </select>
+        </SegmentedControl>
+        <Popover className="appearance">
+          <Popover.Trigger
+            className="appearance-trigger"
+            render={(props) => (
+              <Button {...props} size="small" variant="outline" trailingIcon={<ChevronDownIcon size={14} />}>
+                Appearance
+              </Button>
+            )}
+          />
+          <Popover.Content aria-label="Terminal appearance" placement="bottomEnd" className="appearance-panel">
+            <div className="appearance-fields">
+              <div className="appearance-field">
+                <span id="appearance-font">Font</span>
+                <Select size="small" value={font} onValueChange={(value) => setFont(value as keyof typeof fonts)}>
+                  <Select.Trigger aria-labelledby="appearance-font" />
+                  <Select.Content>
+                    {Object.entries(fonts).map(([value, option]) => (
+                      <Select.Option key={value} value={value}>{option.label}</Select.Option>
+                    ))}
+                  </Select.Content>
+                </Select>
+              </div>
+              <div className="appearance-field">
+                <span id="appearance-size">Size</span>
+                <Select size="small" value={fontSize} onValueChange={setFontSize}>
+                  <Select.Trigger aria-labelledby="appearance-size" />
+                  <Select.Content>
+                    {sizes.map((size) => <Select.Option key={size} value={String(size)}>{size} px</Select.Option>)}
+                  </Select.Content>
+                </Select>
+              </div>
+              <div className="appearance-field">
+                <span id="appearance-theme">Theme</span>
+                <Select size="small" value={theme} onValueChange={(value) => setTheme(value as keyof typeof themes)}>
+                  <Select.Trigger aria-labelledby="appearance-theme" />
+                  <Select.Content>
+                    {Object.entries(themes).map(([value, option]) => (
+                      <Select.Option key={value} value={value}>{option.label}</Select.Option>
+                    ))}
+                  </Select.Content>
+                </Select>
+              </div>
             </div>
-            <div className="appearance-field">
-              <label htmlFor="appearance-size">Size</label>
-              <select id="appearance-size" value={fontSize} onChange={(event) => setFontSize(Number(event.currentTarget.value))}>
-                {sizes.map((size) => <option key={size} value={size}>{size} px</option>)}
-              </select>
-            </div>
-            <div className="appearance-field">
-              <label htmlFor="appearance-theme">Theme</label>
-              <select id="appearance-theme" value={theme} onChange={(event) => setTheme(event.currentTarget.value as keyof typeof themes)}>
-                {Object.entries(themes).map(([value, option]) => <option key={value} value={value}>{option.label}</option>)}
-              </select>
-            </div>
-          </div>
-        </details>
+          </Popover.Content>
+        </Popover>
       </header>
-      <main style={{ backgroundColor: appearance.theme.background }}>
+      <main className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
         {view === 'terminal' && <InteractiveTerminal appearance={appearance} />}
         {view === 'logs' && <SimulatedLogs appearance={appearance} />}
         {import.meta.env.DEV && view === 'shell' && <LocalShell appearance={appearance} />}
@@ -164,8 +201,11 @@ function Playground() {
 const root = document.getElementById('root');
 if (!root) throw new Error('Playground root element is missing.');
 
-createRoot(root).render(
-  <StrictMode>
-    <Playground />
-  </StrictMode>,
-);
+const app = createRoot(root);
+void document.fonts.load(`${defaultFontSize}px ${monoFonts.jetbrainsMono.cssFamily}`, 'W')
+  .catch(() => [])
+  .then((faces) => app.render(
+    <StrictMode>
+      <Playground initialFont={faces.length ? 'jetbrains' : 'system'} />
+    </StrictMode>,
+  ));
