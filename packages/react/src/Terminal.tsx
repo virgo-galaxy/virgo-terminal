@@ -8,7 +8,7 @@ type Xterm = xterm.Terminal;
 const Xterm = xterm.Terminal ?? (Reflect.get(xterm, 'default') as typeof xterm).Terminal;
 const FitAddon = fitAddon.FitAddon ?? (Reflect.get(fitAddon, 'default') as typeof fitAddon).FitAddon;
 
-export type TerminalAppearance = Pick<xterm.ITerminalOptions, 'fontFamily' | 'fontSize' | 'theme'>;
+export type TerminalAppearance = Pick<xterm.ITerminalOptions, 'fontFamily' | 'fontSize' | 'theme' | 'cursorBlink'>;
 
 export interface TerminalSize {
   cols: number;
@@ -17,6 +17,8 @@ export interface TerminalSize {
 
 export interface TerminalHandle {
   write: Xterm['write'];
+  getSize(): TerminalSize | null;
+  focus(): void;
 }
 
 export interface TerminalProps {
@@ -55,6 +57,9 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     if (previous.appearance?.theme !== appearance?.theme) {
       terminal.options.theme = appearance?.theme ?? defaults.theme;
     }
+    if (previous.appearance?.cursorBlink !== appearance?.cursorBlink) {
+      terminal.options.cursorBlink = appearance?.cursorBlink ?? defaults.cursorBlink;
+    }
     if (previous.readOnly !== readOnly) terminal.options.disableStdin = readOnly;
     if (fontChanged || sizeChanged) requestFit.current?.();
   }, [appearance, onData, onReady, onResize, readOnly]);
@@ -63,6 +68,13 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     write(data, callback) {
       instance.current?.write(data, callback);
     },
+    getSize() {
+      const terminal = instance.current;
+      return terminal ? { cols: terminal.cols, rows: terminal.rows } : null;
+    },
+    focus() {
+      instance.current?.focus();
+    },
   }), []);
 
   useEffect(() => {
@@ -70,11 +82,12 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     if (!element) return;
 
     const terminal = new Xterm({ disableStdin: settings.current.readOnly });
-    const { fontFamily, fontSize, theme } = terminal.options;
+    const { fontFamily, fontSize, theme, cursorBlink } = terminal.options;
     defaultAppearance.current = {
       fontFamily: fontFamily ?? 'monospace',
       fontSize: fontSize ?? 15,
       theme: theme ?? {},
+      cursorBlink: cursorBlink ?? false,
     };
     const input = terminal.onData((data) => settings.current.onData?.(data));
     const resize = terminal.onResize((size) => settings.current.onResize?.(size));

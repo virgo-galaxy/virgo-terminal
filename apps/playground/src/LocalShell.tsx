@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Terminal, type TerminalAppearance, type TerminalProps, type TerminalSize } from '@virgo-terminal/react';
-
-type Xterm = Parameters<NonNullable<TerminalProps['onReady']>>[0];
+import { Terminal, type TerminalAppearance, type TerminalHandle, type TerminalSize } from '@virgo-terminal/react';
 
 function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
   if (connection?.readyState === WebSocket.OPEN) {
@@ -10,11 +8,12 @@ function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
 }
 
 export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
-  const [terminal, setTerminal] = useState<Xterm | null>(null);
+  const terminal = useRef<TerminalHandle>(null);
+  const [ready, setReady] = useState(false);
   const socket = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    if (!terminal) return;
+    if (!ready) return;
 
     const endpoint = new URL('/local-shell', window.location.href);
     endpoint.protocol = 'ws:';
@@ -22,17 +21,18 @@ export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
     socket.current = connection;
 
     connection.onopen = () => {
-      sendSize(connection, terminal);
-      terminal.focus();
+      const size = terminal.current?.getSize();
+      if (size) sendSize(connection, size);
+      terminal.current?.focus();
     };
     connection.onmessage = (event) => {
-      if (typeof event.data === 'string') terminal.write(event.data);
+      if (typeof event.data === 'string') terminal.current?.write(event.data);
     };
     connection.onclose = ({ code }) => {
       let message = 'Local shell disconnected';
       if (code === 1000) message = 'Shell exited';
       if (code === 1011) message = 'Local shell failed';
-      terminal.write(`\r\n[${message}]\r\n`);
+      terminal.current?.write(`\r\n[${message}]\r\n`);
     };
 
     return () => {
@@ -42,18 +42,16 @@ export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
       connection.onclose = null;
       connection.close();
     };
-  }, [terminal]);
+  }, [ready]);
 
   return (
     <Terminal
-      appearance={appearance}
+      appearance={{ ...appearance, cursorBlink: true }}
       autoFit
       className="terminal"
+      ref={terminal}
       onResize={(size) => sendSize(socket.current, size)}
-      onReady={(xterm) => {
-        xterm.options.cursorBlink = true;
-        setTerminal(xterm);
-      }}
+      onReady={() => setReady(true)}
       onData={(data) => {
         const connection = socket.current;
         if (connection?.readyState === WebSocket.OPEN) {

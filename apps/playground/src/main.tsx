@@ -25,15 +25,14 @@ function InteractiveTerminal({ appearance }: { appearance: TerminalAppearance })
 
   return (
     <Terminal
-      appearance={appearance}
+      appearance={{ ...appearance, cursorBlink: true }}
       autoFit
       className="terminal"
       ref={terminal}
-      onReady={(xterm) => {
+      onReady={() => {
         inputLength.current = 0;
-        xterm.options.cursorBlink = true;
-        xterm.write(`${loginMessage}\r\n${prompt}`);
-        xterm.focus();
+        terminal.current?.write(`${loginMessage}\r\n${prompt}`);
+        terminal.current?.focus();
       }}
       onData={(data) => {
         if (data === '\x7f' || data === '\b') {
@@ -88,7 +87,7 @@ function SimulatedLogs({ appearance }: { appearance: TerminalAppearance }) {
       className="terminal"
       readOnly
       ref={terminal}
-      onReady={(xterm) => xterm.write(`\x1b[?25l${initialLogs}`)}
+      onReady={() => terminal.current?.write(`\x1b[?25l${initialLogs}`)}
     />
   );
 }
