@@ -26,22 +26,25 @@ body {
   gap: var(--vd-spacing-8);
 }
 
-.appearance {
+.preferences {
   margin-inline-start: auto;
 }
 
-.appearance-trigger[aria-expanded='true'] {
-  border-color: var(--vd-border-focus);
+.preferences-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vd-spacing-16);
 }
 
-.appearance-panel {
-  box-sizing: border-box;
-  inline-size: min(20rem, calc(100vw - var(--vd-spacing-32)));
-}
-
-.appearance-fields {
+.preferences-section {
   display: grid;
   gap: var(--vd-spacing-8);
+}
+
+.preferences-section h3 {
+  margin: 0;
+  font-size: var(--vd-typography-ui-label-medium-font-size);
+  font-weight: var(--vd-typography-ui-title-small-font-weight);
 }
 
 .appearance-field {
@@ -51,6 +54,11 @@ body {
   gap: var(--vd-spacing-8);
   color: var(--vd-text-secondary);
   font-size: var(--vd-typography-ui-label-medium-font-size);
+}
+
+.copy-on-select {
+  flex-direction: row-reverse;
+  justify-content: space-between;
 }
 
 .terminal-frame {

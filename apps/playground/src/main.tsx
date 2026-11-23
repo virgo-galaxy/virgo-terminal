@@ -1,8 +1,8 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { monoFonts } from '@virgo-design/fonts';
-import { ChevronDownIcon } from '@virgo-design/icons';
-import { Button, Popover, SegmentedControl, Select } from '@virgo-design/ui';
+import { SettingsIcon } from '@virgo-design/icons';
+import { Button, Drawer, SegmentedControl, Select, Separator, Switch } from '@virgo-design/ui';
 import { Terminal, type TerminalAppearance, type TerminalHandle } from '@virgo-terminal/react';
 import '@virgo-design/fonts/sans/inter.css';
 import '@virgo-design/fonts/mono/jetbrains-mono.css';
@@ -19,7 +19,9 @@ const loginDate = loadedAt.toDateString().slice(0, 10);
 const loginTime = loadedAt.toTimeString().slice(0, 8);
 const loginMessage = `Last login: ${loginDate} ${loginTime} on ttys001`;
 
-function InteractiveTerminal({ appearance }: { appearance: TerminalAppearance }) {
+type DemoTerminalProps = { appearance: TerminalAppearance; copyOnSelect: boolean };
+
+function InteractiveTerminal({ appearance, copyOnSelect }: DemoTerminalProps) {
   const terminal = useRef<TerminalHandle>(null);
   const inputLength = useRef(0);
 
@@ -28,6 +30,7 @@ function InteractiveTerminal({ appearance }: { appearance: TerminalAppearance })
       appearance={{ ...appearance, cursorBlink: true }}
       autoFit
       className="terminal"
+      copyOnSelect={copyOnSelect}
       ref={terminal}
       onReady={() => {
         inputLength.current = 0;
@@ -68,7 +71,7 @@ function formatLogLine(line: number) {
 
 const initialLogs = Array.from({ length: initialLogCount }, (_, index) => formatLogLine(index + 1)).join('');
 
-function SimulatedLogs({ appearance }: { appearance: TerminalAppearance }) {
+function SimulatedLogs({ appearance, copyOnSelect }: DemoTerminalProps) {
   const terminal = useRef<TerminalHandle>(null);
 
   useEffect(() => {
@@ -85,6 +88,7 @@ function SimulatedLogs({ appearance }: { appearance: TerminalAppearance }) {
       appearance={appearance}
       autoFit
       className="terminal"
+      copyOnSelect={copyOnSelect}
       readOnly
       ref={terminal}
       onReady={() => terminal.current?.write(`\x1b[?25l${initialLogs}`)}
@@ -125,6 +129,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
   const [font, setFont] = useState(initialFont);
   const [fontSize, setFontSize] = useState(String(defaultFontSize));
   const [theme, setTheme] = useState<keyof typeof themes>('classic');
+  const [copyOnSelect, setCopyOnSelect] = useState(false);
   const appearance = { fontFamily: fonts[font].family, fontSize: Number(fontSize), theme: themes[theme].colors };
 
   return (
@@ -147,57 +152,73 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
             <SegmentedControl.Item value="shell">Local Shell</SegmentedControl.Item>
           )}
         </SegmentedControl>
-        <Popover className="appearance">
-          <Popover.Trigger
-            className="appearance-trigger"
+        <Drawer className="preferences">
+          <Drawer.Trigger
             render={(props) => (
-              <Button {...props} size="small" variant="outline" trailingIcon={<ChevronDownIcon size={14} />}>
-                Appearance
+              <Button {...props} size="small" variant="outline" iconOnly aria-label="Terminal preferences">
+                <SettingsIcon aria-hidden="true" />
               </Button>
             )}
           />
-          <Popover.Content aria-label="Terminal appearance" placement="bottomEnd" className="appearance-panel">
-            <div className="appearance-fields">
-              <div className="appearance-field">
-                <span id="appearance-font">Font</span>
-                <Select size="small" value={font} onValueChange={(value) => setFont(value as keyof typeof fonts)}>
-                  <Select.Trigger aria-labelledby="appearance-font" />
-                  <Select.Content>
-                    {Object.entries(fonts).map(([value, option]) => (
-                      <Select.Option key={value} value={value}>{option.label}</Select.Option>
-                    ))}
-                  </Select.Content>
-                </Select>
-              </div>
-              <div className="appearance-field">
-                <span id="appearance-size">Size</span>
-                <Select size="small" value={fontSize} onValueChange={setFontSize}>
-                  <Select.Trigger aria-labelledby="appearance-size" />
-                  <Select.Content>
-                    {sizes.map((size) => <Select.Option key={size} value={String(size)}>{size} px</Select.Option>)}
-                  </Select.Content>
-                </Select>
-              </div>
-              <div className="appearance-field">
-                <span id="appearance-theme">Theme</span>
-                <Select size="small" value={theme} onValueChange={(value) => setTheme(value as keyof typeof themes)}>
-                  <Select.Trigger aria-labelledby="appearance-theme" />
-                  <Select.Content>
-                    {Object.entries(themes).map(([value, option]) => (
-                      <Select.Option key={value} value={value}>{option.label}</Select.Option>
-                    ))}
-                  </Select.Content>
-                </Select>
-              </div>
-            </div>
-          </Popover.Content>
-        </Popover>
+          <Drawer.Portal>
+            <Drawer.Overlay />
+            <Drawer.Content placement="right" size="sm">
+              <Drawer.Header>
+                <Drawer.Title>Terminal preferences</Drawer.Title>
+                <Drawer.Close aria-label="Close preferences" />
+              </Drawer.Header>
+              <Drawer.Body className="preferences-body">
+                <section className="preferences-section" aria-labelledby="appearance-heading">
+                  <h3 id="appearance-heading">Appearance</h3>
+                  <div className="appearance-field">
+                    <span id="appearance-font">Font</span>
+                    <Select size="small" value={font} onValueChange={(value) => setFont(value as keyof typeof fonts)}>
+                      <Select.Trigger aria-labelledby="appearance-font" />
+                      <Select.Content>
+                        {Object.entries(fonts).map(([value, option]) => (
+                          <Select.Option key={value} value={value}>{option.label}</Select.Option>
+                        ))}
+                      </Select.Content>
+                    </Select>
+                  </div>
+                  <div className="appearance-field">
+                    <span id="appearance-size">Size</span>
+                    <Select size="small" value={fontSize} onValueChange={setFontSize}>
+                      <Select.Trigger aria-labelledby="appearance-size" />
+                      <Select.Content>
+                        {sizes.map((size) => <Select.Option key={size} value={String(size)}>{size} px</Select.Option>)}
+                      </Select.Content>
+                    </Select>
+                  </div>
+                  <div className="appearance-field">
+                    <span id="appearance-theme">Theme</span>
+                    <Select size="small" value={theme} onValueChange={(value) => setTheme(value as keyof typeof themes)}>
+                      <Select.Trigger aria-labelledby="appearance-theme" />
+                      <Select.Content>
+                        {Object.entries(themes).map(([value, option]) => (
+                          <Select.Option key={value} value={value}>{option.label}</Select.Option>
+                        ))}
+                      </Select.Content>
+                    </Select>
+                  </div>
+                </section>
+                <Separator decorative />
+                <section className="preferences-section" aria-labelledby="settings-heading">
+                  <h3 id="settings-heading">Settings</h3>
+                  <Switch className="copy-on-select" checked={copyOnSelect} onCheckedChange={setCopyOnSelect}>
+                    Copy on select
+                  </Switch>
+                </section>
+              </Drawer.Body>
+            </Drawer.Content>
+          </Drawer.Portal>
+        </Drawer>
       </header>
       <main className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
-        {view === 'terminal' && <InteractiveTerminal appearance={appearance} />}
-        {view === 'logs' && <SimulatedLogs appearance={appearance} />}
+        {view === 'terminal' && <InteractiveTerminal appearance={appearance} copyOnSelect={copyOnSelect} />}
+        {view === 'logs' && <SimulatedLogs appearance={appearance} copyOnSelect={copyOnSelect} />}
         {import.meta.env.DEV && hasOpenedShell && (
-          <LocalShell appearance={appearance} visible={view === 'shell'} />
+          <LocalShell appearance={appearance} copyOnSelect={copyOnSelect} visible={view === 'shell'} />
         )}
       </main>
     </>

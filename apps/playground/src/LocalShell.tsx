@@ -7,7 +7,11 @@ function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
   }
 }
 
-export function LocalShell({ appearance, visible }: { appearance: TerminalAppearance; visible: boolean }) {
+export function LocalShell({ appearance, copyOnSelect, visible }: {
+  appearance: TerminalAppearance;
+  copyOnSelect: boolean;
+  visible: boolean;
+}) {
   const terminal = useRef<TerminalHandle>(null);
   const [ready, setReady] = useState(false);
   const socket = useRef<WebSocket | null>(null);
@@ -53,6 +57,7 @@ export function LocalShell({ appearance, visible }: { appearance: TerminalAppear
         appearance={{ ...appearance, cursorBlink: true }}
         autoFit
         className="terminal"
+        copyOnSelect={copyOnSelect}
         ref={terminal}
         onResize={(size) => sendSize(socket.current, size)}
         onReady={() => setReady(true)}
