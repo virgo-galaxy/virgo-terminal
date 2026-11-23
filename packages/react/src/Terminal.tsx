@@ -10,6 +10,11 @@ const FitAddon = fitAddon.FitAddon ?? (Reflect.get(fitAddon, 'default') as typeo
 
 export type TerminalAppearance = Pick<xterm.ITerminalOptions, 'fontFamily' | 'fontSize' | 'theme'>;
 
+export interface TerminalSize {
+  cols: number;
+  rows: number;
+}
+
 export interface TerminalHandle {
   write: Xterm['write'];
 }
@@ -21,22 +26,23 @@ export interface TerminalProps {
   className?: string;
   onData?: (data: string) => void;
   onReady?: (terminal: Xterm) => void;
+  onResize?: (size: TerminalSize) => void;
   readOnly?: boolean;
 }
 
 export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Terminal(
-  { appearance, autoFit = false, className, onData, onReady, readOnly = false },
+  { appearance, autoFit = false, className, onData, onReady, onResize, readOnly = false },
   ref,
 ) {
   const container = useRef<HTMLDivElement>(null);
   const instance = useRef<Xterm | null>(null);
   const defaultAppearance = useRef<Required<TerminalAppearance> | null>(null);
   const requestFit = useRef<(() => void) | null>(null);
-  const settings = useRef({ appearance, onData, onReady, readOnly });
+  const settings = useRef({ appearance, onData, onReady, onResize, readOnly });
 
   useLayoutEffect(() => {
     const previous = settings.current;
-    settings.current = { appearance, onData, onReady, readOnly };
+    settings.current = { appearance, onData, onReady, onResize, readOnly };
 
     const terminal = instance.current;
     const defaults = defaultAppearance.current;
@@ -51,7 +57,7 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     }
     if (previous.readOnly !== readOnly) terminal.options.disableStdin = readOnly;
     if (fontChanged || sizeChanged) requestFit.current?.();
-  }, [appearance, onData, onReady, readOnly]);
+  }, [appearance, onData, onReady, onResize, readOnly]);
 
   useImperativeHandle(ref, () => ({
     write(data, callback) {
@@ -71,11 +77,13 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
       theme: theme ?? {},
     };
     const input = terminal.onData((data) => settings.current.onData?.(data));
+    const resize = terminal.onResize((size) => settings.current.onResize?.(size));
 
     function dispose() {
       instance.current = null;
       defaultAppearance.current = null;
       input.dispose();
+      resize.dispose();
       terminal.dispose();
     }
 

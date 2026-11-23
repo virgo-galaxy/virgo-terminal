@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Terminal, type TerminalAppearance, type TerminalProps } from '@virgo-terminal/react';
+import { Terminal, type TerminalAppearance, type TerminalProps, type TerminalSize } from '@virgo-terminal/react';
 
 type Xterm = Parameters<NonNullable<TerminalProps['onReady']>>[0];
+
+function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
+  if (connection?.readyState === WebSocket.OPEN) {
+    connection.send(JSON.stringify({ type: 'resize', cols, rows }));
+  }
+}
 
 export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
   const [terminal, setTerminal] = useState<Xterm | null>(null);
@@ -15,15 +21,8 @@ export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
     const connection = new WebSocket(endpoint);
     socket.current = connection;
 
-    function sendSize({ cols, rows }: { cols: number; rows: number }) {
-      if (connection.readyState === WebSocket.OPEN) {
-        connection.send(JSON.stringify({ type: 'resize', cols, rows }));
-      }
-    }
-
-    const resize = terminal.onResize(sendSize);
     connection.onopen = () => {
-      sendSize(terminal);
+      sendSize(connection, terminal);
       terminal.focus();
     };
     connection.onmessage = (event) => {
@@ -37,7 +36,6 @@ export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
     };
 
     return () => {
-      resize.dispose();
       socket.current = null;
       connection.onopen = null;
       connection.onmessage = null;
@@ -51,6 +49,7 @@ export function LocalShell({ appearance }: { appearance: TerminalAppearance }) {
       appearance={appearance}
       autoFit
       className="terminal"
+      onResize={(size) => sendSize(socket.current, size)}
       onReady={(xterm) => {
         xterm.options.cursorBlink = true;
         setTerminal(xterm);
