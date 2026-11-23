@@ -134,6 +134,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
           aria-label="Playground view"
           size="small"
           variant="soft"
+          motion="slide"
           value={view}
           onValueChange={(value) => setView(value as View)}
         >
