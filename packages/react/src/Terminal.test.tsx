@@ -18,6 +18,7 @@ const { TerminalMock, terminals, fit, disposeFit } = vi.hoisted(() => {
     selection?: IBufferRange;
     selectedText = '';
     write = vi.fn<Xterm['write']>();
+    refresh = vi.fn<Xterm['refresh']>();
     focus = vi.fn();
     dispose = vi.fn(() => this.element.remove());
     loadAddon = vi.fn();
@@ -197,10 +198,14 @@ describe('Terminal', () => {
     expect(onResize).toHaveBeenCalledExactlyOnceWith({ cols: 100, rows: 30 });
     expect(ref.current?.getSize()).toEqual({ cols: 100, rows: 30 });
 
+    render(<Terminal autoFit ref={ref} onResize={onResize} scrollback={0} />);
+    vi.advanceTimersToNextFrame();
+    expect(fit).toHaveBeenCalledTimes(2);
+
     notify();
     render(null);
     vi.advanceTimersToNextFrame();
-    expect(fit).toHaveBeenCalledTimes(1);
+    expect(fit).toHaveBeenCalledTimes(2);
     expect(disconnect).toHaveBeenCalledTimes(1);
     expect(disposeFit).toHaveBeenCalledTimes(1);
   });
@@ -244,6 +249,21 @@ describe('Terminal', () => {
     render(<Terminal />);
     expect(viewport.hasAttribute('data-virgo-terminal-scrollbar')).toBe(false);
     expect(terminals).toHaveLength(1);
+  });
+
+  it('updates the history limit without reopening the terminal', () => {
+    const onReady = vi.fn();
+    render(<Terminal onReady={onReady} scrollback={5000} />);
+    const terminal = getTerminal();
+    expect(terminal.options.scrollback).toBe(5000);
+
+    render(<Terminal onReady={onReady} scrollback={0} />);
+    expect(terminal.options.scrollback).toBe(0);
+    expect(terminal.refresh).toHaveBeenCalledExactlyOnceWith(0, terminal.rows - 1);
+
+    render(<Terminal onReady={onReady} />);
+    expect(terminal.options.scrollback).toBe(1000);
+    expect(onReady).toHaveBeenCalledTimes(1);
   });
 
   it('only copies text on a completed left selection when copyOnSelect is enabled', () => {

@@ -9,11 +9,12 @@ function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
   }
 }
 
-export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, shellId, visible }: {
+export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, scrollback, shellId, visible }: {
   appearance: TerminalAppearance;
   copyOnSelect: boolean;
   onRestart: () => void;
   scrollbar: TerminalScrollbar;
+  scrollback: number;
   shellId: string;
   visible: boolean;
 }) {
@@ -68,6 +69,7 @@ export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, she
         copyOnSelect={copyOnSelect}
         ref={terminal}
         scrollbar={scrollbar}
+        scrollback={scrollback}
         onResize={(size) => sendSize(socket.current, size)}
         onReady={() => setReady(true)}
         onData={(data) => {

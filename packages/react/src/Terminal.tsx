@@ -42,6 +42,8 @@ export interface TerminalProps {
   onResize?: (size: TerminalSize) => void;
   readOnly?: boolean;
   scrollbar?: TerminalScrollbar;
+  /** Number of rows retained above the screen. Use a non-negative integer. Defaults to xterm's limit. */
+  scrollback?: number;
   /** Return false to skip xterm.js handling of this keyboard event. */
   shouldHandleKeyEvent?: (event: KeyboardEvent) => boolean;
 }
@@ -57,22 +59,26 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     onResize,
     readOnly = false,
     scrollbar,
+    scrollback,
     shouldHandleKeyEvent,
   },
   ref,
 ) {
   const container = useRef<HTMLDivElement>(null);
   const instance = useRef<Xterm | null>(null);
-  const defaultAppearance = useRef<Required<TerminalAppearance> | null>(null);
+  const defaultOptions = useRef<(Required<TerminalAppearance> & { scrollback: number }) | null>(null);
   const requestFit = useRef<(() => void) | null>(null);
-  const settings = useRef({ appearance, onData, onReady, onResize, readOnly, shouldHandleKeyEvent });
+  const historyLimit = scrollback !== undefined && Number.isSafeInteger(scrollback) && scrollback >= 0
+    ? scrollback
+    : undefined;
+  const settings = useRef({ appearance, onData, onReady, onResize, readOnly, historyLimit, shouldHandleKeyEvent });
 
   useLayoutEffect(() => {
     const previous = settings.current;
-    settings.current = { appearance, onData, onReady, onResize, readOnly, shouldHandleKeyEvent };
+    settings.current = { appearance, onData, onReady, onResize, readOnly, historyLimit, shouldHandleKeyEvent };
 
     const terminal = instance.current;
-    const defaults = defaultAppearance.current;
+    const defaults = defaultOptions.current;
     if (!terminal || !defaults) return;
 
     const fontChanged = previous.appearance?.fontFamily !== appearance?.fontFamily;
@@ -86,8 +92,17 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
       terminal.options.cursorBlink = appearance?.cursorBlink ?? defaults.cursorBlink;
     }
     if (previous.readOnly !== readOnly) terminal.options.disableStdin = readOnly;
-    if (fontChanged || sizeChanged) requestFit.current?.();
-  }, [appearance, onData, onReady, onResize, readOnly, shouldHandleKeyEvent]);
+
+    const previousLimit = terminal.options.scrollback;
+    const nextLimit = historyLimit ?? defaults.scrollback;
+    if (previous.historyLimit !== historyLimit && previousLimit !== nextLimit) {
+      terminal.options.scrollback = nextLimit;
+      terminal.refresh(0, terminal.rows - 1);
+    }
+    if (fontChanged || sizeChanged || (previousLimit === 0) !== (terminal.options.scrollback === 0)) {
+      requestFit.current?.();
+    }
+  }, [appearance, onData, onReady, onResize, readOnly, historyLimit, shouldHandleKeyEvent]);
 
   useImperativeHandle(ref, () => ({
     write(data, callback) {
@@ -107,19 +122,20 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     if (!element) return;
 
     const terminal = new Xterm({ disableStdin: settings.current.readOnly });
-    const { fontFamily, fontSize, theme, cursorBlink } = terminal.options;
-    defaultAppearance.current = {
+    const { fontFamily, fontSize, theme, cursorBlink, scrollback: nativeScrollback } = terminal.options;
+    defaultOptions.current = {
       fontFamily: fontFamily ?? 'monospace',
       fontSize: fontSize ?? 15,
       theme: theme ?? {},
       cursorBlink: cursorBlink ?? false,
+      scrollback: nativeScrollback ?? 1000,
     };
     const input = terminal.onData((data) => settings.current.onData?.(data));
     const resize = terminal.onResize((size) => settings.current.onResize?.(size));
 
     function dispose() {
       instance.current = null;
-      defaultAppearance.current = null;
+      defaultOptions.current = null;
       input.dispose();
       resize.dispose();
       terminal.dispose();
@@ -127,6 +143,7 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
 
     try {
       if (settings.current.appearance) terminal.options = settings.current.appearance;
+      if (settings.current.historyLimit !== undefined) terminal.options.scrollback = settings.current.historyLimit;
       terminal.open(element);
       terminal.attachCustomKeyEventHandler((event) => settings.current.shouldHandleKeyEvent?.(event) ?? true);
       instance.current = terminal;

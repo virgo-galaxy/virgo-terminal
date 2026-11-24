@@ -20,9 +20,14 @@ const loginDate = loadedAt.toDateString().slice(0, 10);
 const loginTime = loadedAt.toTimeString().slice(0, 8);
 const loginMessage = `Last login: ${loginDate} ${loginTime} on ttys001`;
 
-type DemoTerminalProps = { appearance: TerminalAppearance; copyOnSelect: boolean; scrollbar: TerminalScrollbar };
+type DemoTerminalProps = {
+  appearance: TerminalAppearance;
+  copyOnSelect: boolean;
+  scrollbar: TerminalScrollbar;
+  scrollback: number;
+};
 
-function InteractiveTerminal({ appearance, copyOnSelect, scrollbar }: DemoTerminalProps) {
+function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrollback }: DemoTerminalProps) {
   const terminal = useRef<TerminalHandle>(null);
   const inputLength = useRef(0);
 
@@ -34,6 +39,7 @@ function InteractiveTerminal({ appearance, copyOnSelect, scrollbar }: DemoTermin
       copyOnSelect={copyOnSelect}
       ref={terminal}
       scrollbar={scrollbar}
+      scrollback={scrollback}
       onReady={() => {
         inputLength.current = 0;
         terminal.current?.write(`${loginMessage}\r\n${prompt}`);
@@ -92,7 +98,7 @@ function formatLogLine(sequence: number, time = new Date()) {
   return `${timestamp}  ${level}  ${method.padEnd(5)}  ${path.padEnd(17)}  ${status}  ${latency}${message}\r\n`;
 }
 
-function SimulatedLogs({ appearance, copyOnSelect, scrollbar }: DemoTerminalProps) {
+function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback }: DemoTerminalProps) {
   const terminal = useRef<TerminalHandle>(null);
 
   useEffect(() => {
@@ -113,6 +119,7 @@ function SimulatedLogs({ appearance, copyOnSelect, scrollbar }: DemoTerminalProp
       readOnly
       ref={terminal}
       scrollbar={scrollbar}
+      scrollback={scrollback}
       onReady={() => {
         const now = Date.now();
         const history = Array.from({ length: initialLogCount }, (_, index) => (
@@ -135,6 +142,7 @@ const defaultFontSize = 15;
 const sizes = [12, 14, 15, 16, 18, 20, 24];
 const scrollbarWidths = [4, 6, 8, 10, 12, 14];
 const scrollbarRadii = [0, 2, 3, 5, 7];
+const historyLimits = [0, 500, 1000, 5000, 10000];
 type ScrollbarVisibility = NonNullable<TerminalScrollbar['visibility']>;
 
 const themes = {
@@ -169,6 +177,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
   const [scrollbarVisibility, setScrollbarVisibility] = useState<ScrollbarVisibility>('auto');
   const [scrollbarWidth, setScrollbarWidth] = useState('6');
   const [scrollbarRadius, setScrollbarRadius] = useState('3');
+  const [history, setHistory] = useState('1000');
   const [copyOnSelect, setCopyOnSelect] = useState(false);
   const appearance = { fontFamily: fonts[font].family, fontSize: Number(fontSize), theme: themes[theme].colors };
   const demoTerminalProps: DemoTerminalProps = {
@@ -179,6 +188,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
       thumbWidth: Number(scrollbarWidth),
       thumbRadius: Number(scrollbarRadius),
     },
+    scrollback: Number(history),
   };
 
   useEffect(() => {
@@ -306,6 +316,19 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
                   <Switch className="copy-on-select" checked={copyOnSelect} onCheckedChange={setCopyOnSelect}>
                     Copy on select
                   </Switch>
+                  <div className="preference-field">
+                    <span id="history-label">History</span>
+                    <Select size="small" value={history} onValueChange={setHistory}>
+                      <Select.Trigger aria-labelledby="history-label" />
+                      <Select.Content>
+                        {historyLimits.map((limit) => (
+                          <Select.Option key={limit} value={String(limit)}>
+                            {limit === 0 ? 'Screen only' : `${limit.toLocaleString('en-US')} lines`}
+                          </Select.Option>
+                        ))}
+                      </Select.Content>
+                    </Select>
+                  </div>
                   {import.meta.env.DEV && (
                     <>
                       <div className="preference-field">
