@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { PlayFilledIcon } from '@virgo-design/icons';
 import { Button } from '@virgo-design/ui';
-import { Terminal, type TerminalAppearance, type TerminalHandle, type TerminalSize } from '@virgo-terminal/react';
+import { Terminal, type TerminalAppearance, type TerminalHandle, type TerminalScrollbar, type TerminalSize } from '@virgo-terminal/react';
 
 function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
   if (connection?.readyState === WebSocket.OPEN) {
@@ -9,10 +9,11 @@ function sendSize(connection: WebSocket | null, { cols, rows }: TerminalSize) {
   }
 }
 
-export function LocalShell({ appearance, copyOnSelect, onRestart, shellId, visible }: {
+export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, shellId, visible }: {
   appearance: TerminalAppearance;
   copyOnSelect: boolean;
   onRestart: () => void;
+  scrollbar: TerminalScrollbar;
   shellId: string;
   visible: boolean;
 }) {
@@ -66,6 +67,7 @@ export function LocalShell({ appearance, copyOnSelect, onRestart, shellId, visib
         className="local-shell-terminal"
         copyOnSelect={copyOnSelect}
         ref={terminal}
+        scrollbar={scrollbar}
         onResize={(size) => sendSize(socket.current, size)}
         onReady={() => setReady(true)}
         onData={(data) => {

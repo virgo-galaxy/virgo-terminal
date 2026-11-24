@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { monoFonts } from '@virgo-design/fonts';
 import { SettingsIcon } from '@virgo-design/icons';
 import { Button, Drawer, SegmentedControl, Select, Separator, Switch } from '@virgo-design/ui';
-import { Terminal, type TerminalAppearance, type TerminalHandle } from '@virgo-terminal/react';
+import { Terminal, type TerminalAppearance, type TerminalHandle, type TerminalScrollbar } from '@virgo-terminal/react';
 import '@virgo-design/fonts/sans/inter.css';
 import '@virgo-design/fonts/mono/jetbrains-mono.css';
 import '@virgo-design/tokens/styles.css';
@@ -20,9 +20,9 @@ const loginDate = loadedAt.toDateString().slice(0, 10);
 const loginTime = loadedAt.toTimeString().slice(0, 8);
 const loginMessage = `Last login: ${loginDate} ${loginTime} on ttys001`;
 
-type DemoTerminalProps = { appearance: TerminalAppearance; copyOnSelect: boolean };
+type DemoTerminalProps = { appearance: TerminalAppearance; copyOnSelect: boolean; scrollbar: TerminalScrollbar };
 
-function InteractiveTerminal({ appearance, copyOnSelect }: DemoTerminalProps) {
+function InteractiveTerminal({ appearance, copyOnSelect, scrollbar }: DemoTerminalProps) {
   const terminal = useRef<TerminalHandle>(null);
   const inputLength = useRef(0);
 
@@ -33,6 +33,7 @@ function InteractiveTerminal({ appearance, copyOnSelect }: DemoTerminalProps) {
       className="terminal"
       copyOnSelect={copyOnSelect}
       ref={terminal}
+      scrollbar={scrollbar}
       onReady={() => {
         inputLength.current = 0;
         terminal.current?.write(`${loginMessage}\r\n${prompt}`);
@@ -91,7 +92,7 @@ function formatLogLine(sequence: number, time = new Date()) {
   return `${timestamp}  ${level}  ${method.padEnd(5)}  ${path.padEnd(17)}  ${status}  ${latency}${message}\r\n`;
 }
 
-function SimulatedLogs({ appearance, copyOnSelect }: DemoTerminalProps) {
+function SimulatedLogs({ appearance, copyOnSelect, scrollbar }: DemoTerminalProps) {
   const terminal = useRef<TerminalHandle>(null);
 
   useEffect(() => {
@@ -111,6 +112,7 @@ function SimulatedLogs({ appearance, copyOnSelect }: DemoTerminalProps) {
       copyOnSelect={copyOnSelect}
       readOnly
       ref={terminal}
+      scrollbar={scrollbar}
       onReady={() => {
         const now = Date.now();
         const history = Array.from({ length: initialLogCount }, (_, index) => (
@@ -131,6 +133,9 @@ const fonts = {
 
 const defaultFontSize = 15;
 const sizes = [12, 14, 15, 16, 18, 20, 24];
+const scrollbarWidths = [4, 6, 8, 10, 12, 14];
+const scrollbarRadii = [0, 2, 3, 5, 7];
+type ScrollbarVisibility = NonNullable<TerminalScrollbar['visibility']>;
 
 const themes = {
   classic: { label: 'Classic', colors: { background: '#000000', foreground: '#ffffff' } },
@@ -161,8 +166,20 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
   const [font, setFont] = useState(initialFont);
   const [fontSize, setFontSize] = useState(String(defaultFontSize));
   const [theme, setTheme] = useState<keyof typeof themes>('classic');
+  const [scrollbarVisibility, setScrollbarVisibility] = useState<ScrollbarVisibility>('auto');
+  const [scrollbarWidth, setScrollbarWidth] = useState('6');
+  const [scrollbarRadius, setScrollbarRadius] = useState('3');
   const [copyOnSelect, setCopyOnSelect] = useState(false);
   const appearance = { fontFamily: fonts[font].family, fontSize: Number(fontSize), theme: themes[theme].colors };
+  const demoTerminalProps: DemoTerminalProps = {
+    appearance,
+    copyOnSelect,
+    scrollbar: {
+      visibility: scrollbarVisibility,
+      thumbWidth: Number(scrollbarWidth),
+      thumbRadius: Number(scrollbarRadius),
+    },
+  };
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -251,6 +268,37 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
                       </Select.Content>
                     </Select>
                   </div>
+                  <div className="preferences-section scrollbar-preferences" role="group" aria-labelledby="scrollbar-heading">
+                    <h4 id="scrollbar-heading">Scrollbar</h4>
+                    <div className="preference-field">
+                      <span id="scrollbar-display">Display</span>
+                      <Select size="small" value={scrollbarVisibility} onValueChange={(value) => setScrollbarVisibility(value as ScrollbarVisibility)}>
+                        <Select.Trigger aria-labelledby="scrollbar-heading scrollbar-display" />
+                        <Select.Content>
+                          <Select.Option value="auto">Automatic</Select.Option>
+                          <Select.Option value="hidden">Hidden</Select.Option>
+                        </Select.Content>
+                      </Select>
+                    </div>
+                    <div className="preference-field">
+                      <span id="scrollbar-width">Width</span>
+                      <Select size="small" value={scrollbarWidth} onValueChange={setScrollbarWidth}>
+                        <Select.Trigger aria-labelledby="scrollbar-heading scrollbar-width" />
+                        <Select.Content>
+                          {scrollbarWidths.map((width) => <Select.Option key={width} value={String(width)}>{width} px</Select.Option>)}
+                        </Select.Content>
+                      </Select>
+                    </div>
+                    <div className="preference-field">
+                      <span id="scrollbar-radius">Radius</span>
+                      <Select size="small" value={scrollbarRadius} onValueChange={setScrollbarRadius}>
+                        <Select.Trigger aria-labelledby="scrollbar-heading scrollbar-radius" />
+                        <Select.Content>
+                          {scrollbarRadii.map((radius) => <Select.Option key={radius} value={String(radius)}>{radius} px</Select.Option>)}
+                        </Select.Content>
+                      </Select>
+                    </div>
+                  </div>
                 </section>
                 <Separator decorative />
                 <section className="preferences-section" aria-labelledby="settings-heading">
@@ -281,13 +329,12 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
         </Drawer>
       </header>
       <main className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
-        {view === 'terminal' && <InteractiveTerminal appearance={appearance} copyOnSelect={copyOnSelect} />}
-        {view === 'logs' && <SimulatedLogs appearance={appearance} copyOnSelect={copyOnSelect} />}
+        {view === 'terminal' && <InteractiveTerminal {...demoTerminalProps} />}
+        {view === 'logs' && <SimulatedLogs {...demoTerminalProps} />}
         {import.meta.env.DEV && shellSession && (
           <LocalShell
             key={shellSession.attempt}
-            appearance={appearance}
-            copyOnSelect={copyOnSelect}
+            {...demoTerminalProps}
             onRestart={startShell}
             shellId={shellSession.shellId}
             visible={view === 'shell'}

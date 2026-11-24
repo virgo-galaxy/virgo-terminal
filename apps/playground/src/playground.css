@@ -41,10 +41,15 @@ body {
   gap: var(--vd-spacing-8);
 }
 
-.preferences-section h3 {
+.preferences-section h3,
+.preferences-section h4 {
   margin: 0;
   font-size: var(--vd-typography-ui-label-medium-font-size);
   font-weight: var(--vd-typography-ui-title-small-font-weight);
+}
+
+.scrollbar-preferences {
+  margin-block-start: var(--vd-spacing-4);
 }
 
 .preference-field {
