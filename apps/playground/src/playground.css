@@ -103,13 +103,31 @@ body {
 
 .example-source-toolbar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--vd-spacing-8);
   padding: var(--vd-spacing-4) var(--vd-spacing-8);
   color: var(--vd-text-secondary);
   font-size: var(--vd-typography-ui-label-medium-font-size);
+}
+
+.example-source-file-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vd-spacing-4);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.example-source-file-trigger:hover {
+  color: var(--vd-text-primary);
+}
+
+.example-source-file-trigger:focus-visible {
+  outline: var(--vd-border-width-2) solid var(--vd-border-focus);
+  outline-offset: var(--vd-spacing-2);
 }
 
 .example-source pre {

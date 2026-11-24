@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { SegmentedControl } from '@virgo-design/ui';
+import { ChevronDownIcon } from '@virgo-design/icons';
+import { Menu } from '@virgo-design/ui';
 import interactiveTerminalSource from './InteractiveTerminal.tsx?raw';
 import simulatedLogsSource from './SimulatedLogs.tsx?raw';
 import localShellSource from './LocalShell.tsx?raw';
@@ -27,19 +28,22 @@ export function ExampleSource({ view }: { view: ExampleView }) {
   return (
     <div className="example-source">
       <div className="example-source-toolbar">
-        <span>{file.name}</span>
-        {import.meta.env.DEV && view === 'shell' && (
-          <SegmentedControl
-            aria-label="Local Shell source file"
-            size="small"
-            variant="soft"
-            motion="slide"
-            value={shellFile}
-            onValueChange={(value) => setShellFile(value === 'server' ? 'server' : 'client')}
-          >
-            <SegmentedControl.Item value="client">Client</SegmentedControl.Item>
-            <SegmentedControl.Item value="server">PTY server</SegmentedControl.Item>
-          </SegmentedControl>
+        {import.meta.env.DEV && view === 'shell' ? (
+          <Menu size="small">
+            <Menu.Trigger render={(props) => <button {...props} className="example-source-file-trigger" />}>
+              {file.name}
+              <ChevronDownIcon size={12} aria-hidden="true" />
+            </Menu.Trigger>
+            <Menu.Content>
+              <Menu.RadioGroup value={shellFile} onValueChange={(value) => setShellFile(value === 'server' ? 'server' : 'client')}>
+                {Object.entries(shellFiles).map(([value, sourceFile]) => (
+                  <Menu.RadioItem key={value} value={value} closeOnSelect>{sourceFile.name}</Menu.RadioItem>
+                ))}
+              </Menu.RadioGroup>
+            </Menu.Content>
+          </Menu>
+        ) : (
+          <span>{file.name}</span>
         )}
       </div>
       <pre key={file.name} tabIndex={0} aria-label={`${file.name} source code`}>
