@@ -165,20 +165,30 @@ type ShellOption = { id: string; label: string };
 type ShellSession = { attempt: number; shellId: string };
 
 const defaultShellOption = { id: 'system', label: 'System default' };
+const defaultPreferences = {
+  fontSize: String(defaultFontSize),
+  theme: 'classic' as const,
+  scrollbarVisibility: 'auto' as const,
+  scrollbarWidth: '6',
+  scrollbarRadius: '3',
+  history: '1000',
+  copyOnSelect: false,
+  shellId: defaultShellOption.id,
+};
 
 function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
   const [view, setView] = useState<View>('terminal');
   const [shellSession, setShellSession] = useState<ShellSession | null>(null);
   const [shellOptions, setShellOptions] = useState<ShellOption[]>([defaultShellOption]);
-  const [shellId, setShellId] = useState(defaultShellOption.id);
+  const [shellId, setShellId] = useState(defaultPreferences.shellId);
   const [font, setFont] = useState(initialFont);
-  const [fontSize, setFontSize] = useState(String(defaultFontSize));
-  const [theme, setTheme] = useState<keyof typeof themes>('classic');
-  const [scrollbarVisibility, setScrollbarVisibility] = useState<ScrollbarVisibility>('auto');
-  const [scrollbarWidth, setScrollbarWidth] = useState('6');
-  const [scrollbarRadius, setScrollbarRadius] = useState('3');
-  const [history, setHistory] = useState('1000');
-  const [copyOnSelect, setCopyOnSelect] = useState(false);
+  const [fontSize, setFontSize] = useState(defaultPreferences.fontSize);
+  const [theme, setTheme] = useState<keyof typeof themes>(defaultPreferences.theme);
+  const [scrollbarVisibility, setScrollbarVisibility] = useState<ScrollbarVisibility>(defaultPreferences.scrollbarVisibility);
+  const [scrollbarWidth, setScrollbarWidth] = useState(defaultPreferences.scrollbarWidth);
+  const [scrollbarRadius, setScrollbarRadius] = useState(defaultPreferences.scrollbarRadius);
+  const [history, setHistory] = useState(defaultPreferences.history);
+  const [copyOnSelect, setCopyOnSelect] = useState(defaultPreferences.copyOnSelect);
   const appearance = { fontFamily: fonts[font].family, fontSize: Number(fontSize), theme: themes[theme].colors };
   const demoTerminalProps: DemoTerminalProps = {
     appearance,
@@ -206,6 +216,18 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
 
   function startShell() {
     setShellSession((session) => ({ attempt: (session?.attempt ?? 0) + 1, shellId }));
+  }
+
+  function restoreDefaults() {
+    setFont(initialFont);
+    setFontSize(defaultPreferences.fontSize);
+    setTheme(defaultPreferences.theme);
+    setScrollbarVisibility(defaultPreferences.scrollbarVisibility);
+    setScrollbarWidth(defaultPreferences.scrollbarWidth);
+    setScrollbarRadius(defaultPreferences.scrollbarRadius);
+    setHistory(defaultPreferences.history);
+    setCopyOnSelect(defaultPreferences.copyOnSelect);
+    setShellId(defaultPreferences.shellId);
   }
 
   return (
@@ -347,6 +369,11 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
                   )}
                 </section>
               </Drawer.Body>
+              <Drawer.Footer>
+                <Button type="button" size="small" variant="outline" onClick={restoreDefaults}>
+                  Restore defaults
+                </Button>
+              </Drawer.Footer>
             </Drawer.Content>
           </Drawer.Portal>
         </Drawer>
