@@ -81,6 +81,45 @@ body {
   padding: var(--vd-spacing-8);
 }
 
+.example-preview {
+  height: 100%;
+}
+
+.example-source {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--vd-spacing-8);
+  height: 100%;
+}
+
+.example-source-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vd-spacing-8);
+  padding: var(--vd-spacing-4) var(--vd-spacing-8);
+  color: var(--vd-text-secondary);
+  font-size: var(--vd-typography-ui-label-medium-font-size);
+}
+
+.example-source pre {
+  min-width: 0;
+  overflow: auto;
+  margin: 0;
+  padding: var(--vd-spacing-12);
+  background: var(--vd-surface-default);
+  border-radius: var(--vd-shape-radius-6);
+  font-family: var(--vd-font-family-mono, monospace);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.example-source code {
+  font: inherit;
+}
+
 .terminal {
   height: 100%;
 }

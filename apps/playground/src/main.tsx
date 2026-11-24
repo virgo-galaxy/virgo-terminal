@@ -1,9 +1,9 @@
-import { StrictMode, useEffect, useRef, useState } from 'react';
+import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { monoFonts } from '@virgo-design/fonts';
-import { ArrowUpIcon, SettingsIcon } from '@virgo-design/icons';
+import { SettingsIcon } from '@virgo-design/icons';
 import { Button, Drawer, SegmentedControl, Select, Separator, Switch } from '@virgo-design/ui';
-import { Terminal, type TerminalAppearance, type TerminalHandle, type TerminalScrollbar } from '@virgo-terminal/react';
+import type { TerminalAppearance, TerminalScrollbar } from '@virgo-terminal/react';
 import '@virgo-design/fonts/sans/inter.css';
 import '@virgo-design/fonts/mono/jetbrains-mono.css';
 import '@virgo-design/tokens/styles.css';
@@ -12,150 +12,11 @@ import '@virgo-design/ui/styles.css';
 import '@virgo-terminal/react/styles.css';
 import './playground.css';
 import terminalLogo from './assets/virgo-terminal-logo.svg';
+import type { DemoTerminalProps } from './demo-terminal-props';
+import { ExampleSource, type ExampleView } from './ExampleSource';
+import { InteractiveTerminal } from './InteractiveTerminal';
 import { LocalShell } from './LocalShell';
-
-const prompt = '[root@localhost] # ~ ';
-const loadedAt = new Date();
-const loginDate = loadedAt.toDateString().slice(0, 10);
-const loginTime = loadedAt.toTimeString().slice(0, 8);
-const loginMessage = `Last login: ${loginDate} ${loginTime} on ttys001`;
-
-type DemoTerminalProps = {
-  appearance: TerminalAppearance;
-  copyOnSelect: boolean;
-  scrollbar: TerminalScrollbar;
-  scrollback: number;
-};
-
-function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrollback }: DemoTerminalProps) {
-  const terminal = useRef<TerminalHandle>(null);
-  const inputLength = useRef(0);
-
-  return (
-    <Terminal
-      appearance={{ ...appearance, cursorBlink: true }}
-      autoFit
-      className="terminal"
-      copyOnSelect={copyOnSelect}
-      ref={terminal}
-      scrollbar={scrollbar}
-      scrollback={scrollback}
-      onReady={() => {
-        inputLength.current = 0;
-        terminal.current?.write(`${loginMessage}\r\n${prompt}`);
-        terminal.current?.focus();
-      }}
-      onData={(data) => {
-        if (data === '\x7f' || data === '\b') {
-          if (inputLength.current > 0) {
-            inputLength.current -= 1;
-            terminal.current?.write('\b \b');
-          }
-          return;
-        }
-        if (data.startsWith('\x1b')) return;
-
-        const text = Array.from(data.replace(/\r\n?/g, '\n'))
-          .filter((char) => char === '\n' || (char >= ' ' && char !== '\x7f'))
-          .join('');
-        const lastNewline = text.lastIndexOf('\n');
-        if (lastNewline !== -1) inputLength.current = 0;
-        inputLength.current += Array.from(text.slice(lastNewline + 1)).length;
-        terminal.current?.write(text.replaceAll('\n', `\r\n${prompt}`));
-      }}
-    />
-  );
-}
-
-const initialLogCount = 80;
-const logIntervalMs = 500;
-
-type LogRequest = { method: string; path: string; status: number; durationMs: number; detail?: string };
-
-const successfulRequests = [
-  { method: 'GET', path: '/api/health', status: 200, durationMs: 3 },
-  { method: 'GET', path: '/api/projects', status: 200, durationMs: 16 },
-  { method: 'POST', path: '/api/jobs', status: 202, durationMs: 38 },
-  { method: 'GET', path: '/api/jobs/104', status: 200, durationMs: 22 },
-  { method: 'PATCH', path: '/api/projects/12', status: 204, durationMs: 29 },
-] as const satisfies readonly LogRequest[];
-
-const failedRequests = [
-  { method: 'GET', path: '/api/projects/87', status: 404, durationMs: 10, detail: 'Project not found' },
-  { method: 'POST', path: '/api/jobs', status: 429, durationMs: 8, detail: 'Rate limited' },
-  { method: 'GET', path: '/api/jobs/104', status: 503, durationMs: 125, detail: 'Upstream unavailable' },
-] as const satisfies readonly LogRequest[];
-
-function formatLogLine(sequence: number, time = new Date()) {
-  const failed = sequence % 9 === 0;
-  const samples = failed ? failedRequests : successfulRequests;
-  const index = failed ? sequence / 9 : sequence - 1;
-  const { method, path, status, durationMs, detail }: LogRequest = samples[index % samples.length] ?? samples[0];
-  const timestamp = `${time.toTimeString().slice(0, 8)}.${String(time.getMilliseconds()).padStart(3, '0')}`;
-  const level = status >= 500 ? '\x1b[91mERROR\x1b[0m' : status >= 400 ? '\x1b[33mWARN \x1b[0m' : '\x1b[32mINFO \x1b[0m';
-  const latency = `${durationMs + Math.floor(Math.random() * 12)}ms`.padStart(5);
-  const message = detail ? `  ${detail}` : '';
-  return `${timestamp}  ${level}  ${method.padEnd(5)}  ${path.padEnd(17)}  ${status}  ${latency}${message}\r\n`;
-}
-
-function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback, showBackToTop }: DemoTerminalProps & {
-  showBackToTop: boolean;
-}) {
-  const terminal = useRef<TerminalHandle>(null);
-  const [canScrollUp, setCanScrollUp] = useState(false);
-
-  useEffect(() => {
-    let line = initialLogCount;
-    const timer = window.setInterval(() => {
-      line += 1;
-      terminal.current?.write(formatLogLine(line));
-    }, logIntervalMs);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="simulated-logs">
-      <Terminal
-        appearance={appearance}
-        autoFit
-        className="terminal"
-        copyOnSelect={copyOnSelect}
-        readOnly
-        ref={terminal}
-        scrollbar={scrollbar}
-        scrollback={scrollback}
-        onReady={(xterm) => {
-          xterm.onRender(() => setCanScrollUp(xterm.buffer.active.viewportY > 0));
-          xterm.onSelectionChange(() => {
-            if (xterm.hasSelection() && !xterm.getSelection()) xterm.clearSelection();
-          });
-          const now = Date.now();
-          const history = Array.from({ length: initialLogCount }, (_, index) => (
-            formatLogLine(index + 1, new Date(now - (initialLogCount - index) * logIntervalMs))
-          )).join('');
-          xterm.write(`\x1b[?25l${history}`);
-        }}
-      />
-      {showBackToTop && canScrollUp && (
-        <Button
-          type="button"
-          className="logs-back-to-top"
-          variant="secondary"
-          size="small"
-          iconOnly
-          aria-label="Back to top"
-          title="Back to top"
-          onClick={() => {
-            terminal.current?.focus();
-            terminal.current?.scrollToTop();
-          }}
-        >
-          <ArrowUpIcon aria-hidden="true" />
-        </Button>
-      )}
-    </div>
-  );
-}
+import { SimulatedLogs } from './SimulatedLogs';
 
 const fonts = {
   jetbrains: { label: monoFonts.jetbrainsMono.name, family: `${monoFonts.jetbrainsMono.cssFamily}, monospace` },
@@ -186,7 +47,7 @@ const themes = {
   },
 } satisfies Record<string, { label: string; colors: NonNullable<TerminalAppearance['theme']> }>;
 
-type View = 'terminal' | 'logs' | 'shell';
+type Presentation = 'preview' | 'code';
 type ShellOption = { id: string; label: string };
 type ShellSession = { attempt: number; shellId: string };
 
@@ -204,7 +65,8 @@ const defaultPreferences = {
 };
 
 function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
-  const [view, setView] = useState<View>('terminal');
+  const [view, setView] = useState<ExampleView>('terminal');
+  const [presentation, setPresentation] = useState<Presentation>('preview');
   const [shellSession, setShellSession] = useState<ShellSession | null>(null);
   const [shellOptions, setShellOptions] = useState<ShellOption[]>([defaultShellOption]);
   const [shellId, setShellId] = useState(defaultPreferences.shellId);
@@ -246,6 +108,12 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
     setShellSession((session) => ({ attempt: (session?.attempt ?? 0) + 1, shellId }));
   }
 
+  function selectExample(nextView: ExampleView, nextPresentation: Presentation) {
+    setView(nextView);
+    setPresentation(nextPresentation);
+    if (nextView === 'shell' && nextPresentation === 'preview' && !shellSession) startShell();
+  }
+
   function restoreDefaults() {
     setFont(initialFont);
     setFontSize(defaultPreferences.fontSize);
@@ -269,16 +137,24 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
           variant="soft"
           motion="slide"
           value={view}
-          onValueChange={(value) => {
-            setView(value as View);
-            if (value === 'shell' && !shellSession) startShell();
-          }}
+          onValueChange={(value) => selectExample(value as ExampleView, presentation)}
         >
           <SegmentedControl.Item value="terminal">Terminal</SegmentedControl.Item>
           <SegmentedControl.Item value="logs">Simulated logs</SegmentedControl.Item>
           {import.meta.env.DEV && (
             <SegmentedControl.Item value="shell">Local Shell</SegmentedControl.Item>
           )}
+        </SegmentedControl>
+        <SegmentedControl
+          aria-label="Example presentation"
+          size="small"
+          variant="soft"
+          motion="slide"
+          value={presentation}
+          onValueChange={(value) => selectExample(view, value === 'code' ? 'code' : 'preview')}
+        >
+          <SegmentedControl.Item value="preview">Preview</SegmentedControl.Item>
+          <SegmentedControl.Item value="code">Code</SegmentedControl.Item>
         </SegmentedControl>
         <Drawer className="preferences">
           <Drawer.Trigger
@@ -410,18 +286,24 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
           </Drawer.Portal>
         </Drawer>
       </header>
-      <main className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
-        {view === 'terminal' && <InteractiveTerminal {...demoTerminalProps} />}
-        {view === 'logs' && <SimulatedLogs {...demoTerminalProps} showBackToTop={showBackToTop} />}
-        {import.meta.env.DEV && shellSession && (
-          <LocalShell
-            key={shellSession.attempt}
-            {...demoTerminalProps}
-            onRestart={startShell}
-            shellId={shellSession.shellId}
-            visible={view === 'shell'}
-          />
-        )}
+      <main
+        className="terminal-frame"
+        style={presentation === 'preview' ? { backgroundColor: appearance.theme.background } : undefined}
+      >
+        <div className="example-preview" hidden={presentation !== 'preview'}>
+          {view === 'terminal' && <InteractiveTerminal {...demoTerminalProps} visible={presentation === 'preview'} />}
+          {view === 'logs' && <SimulatedLogs {...demoTerminalProps} showBackToTop={showBackToTop} />}
+          {import.meta.env.DEV && shellSession && (
+            <LocalShell
+              key={shellSession.attempt}
+              {...demoTerminalProps}
+              onRestart={startShell}
+              shellId={shellSession.shellId}
+              visible={view === 'shell' && presentation === 'preview'}
+            />
+          )}
+        </div>
+        {presentation === 'code' && <ExampleSource key={view} view={view} />}
       </main>
     </>
   );

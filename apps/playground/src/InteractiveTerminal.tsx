@@ -1,0 +1,54 @@
+import { useEffect, useRef } from 'react';
+import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
+import type { DemoTerminalProps } from './demo-terminal-props';
+
+const prompt = '[root@localhost] # ~ ';
+const loadedAt = new Date();
+const loginDate = loadedAt.toDateString().slice(0, 10);
+const loginTime = loadedAt.toTimeString().slice(0, 8);
+const loginMessage = `Last login: ${loginDate} ${loginTime} on ttys001`;
+
+export function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrollback, visible }: DemoTerminalProps & {
+  visible: boolean;
+}) {
+  const terminal = useRef<TerminalHandle>(null);
+  const inputLength = useRef(0);
+
+  useEffect(() => {
+    if (visible) terminal.current?.focus();
+  }, [visible]);
+
+  return (
+    <Terminal
+      appearance={{ ...appearance, cursorBlink: true }}
+      autoFit
+      className="terminal"
+      copyOnSelect={copyOnSelect}
+      ref={terminal}
+      scrollbar={scrollbar}
+      scrollback={scrollback}
+      onReady={() => {
+        inputLength.current = 0;
+        terminal.current?.write(`${loginMessage}\r\n${prompt}`);
+      }}
+      onData={(data) => {
+        if (data === '\x7f' || data === '\b') {
+          if (inputLength.current > 0) {
+            inputLength.current -= 1;
+            terminal.current?.write('\b \b');
+          }
+          return;
+        }
+        if (data.startsWith('\x1b')) return;
+
+        const text = Array.from(data.replace(/\r\n?/g, '\n'))
+          .filter((char) => char === '\n' || (char >= ' ' && char !== '\x7f'))
+          .join('');
+        const lastNewline = text.lastIndexOf('\n');
+        if (lastNewline !== -1) inputLength.current = 0;
+        inputLength.current += Array.from(text.slice(lastNewline + 1)).length;
+        terminal.current?.write(text.replaceAll('\n', `\r\n${prompt}`));
+      }}
+    />
+  );
+}
