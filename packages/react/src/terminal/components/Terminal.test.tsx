@@ -4,7 +4,8 @@ import type { IBufferRange, ITerminalOptions, Terminal as Xterm } from '@xterm/x
 import { act, createRef, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Terminal, type TerminalHandle, type TerminalSize } from './Terminal.js';
+import { Terminal } from './Terminal.js';
+import type { TerminalHandle, TerminalSize } from '../types.js';
 
 const { TerminalMock, terminals, fit, disposeFit } = vi.hoisted(() => {
   const terminals: TerminalMock[] = [];
