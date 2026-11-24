@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="148 150 954 954" role="img" aria-labelledby="logo-title">
+  <title id="logo-title">Virgo Terminal</title>
+  <defs>
+    <linearGradient id="silver-rim" x1="12%" y1="0%" x2="77%" y2="100%">
+      <stop stop-color="#dde7ef"/>
+      <stop offset=".43" stop-color="#c2ced9"/>
+      <stop offset="1" stop-color="#8996a5"/>
+    </linearGradient>
+    <linearGradient id="silver-cursor" x1="12%" y1="0%" x2="83%" y2="100%">
+      <stop stop-color="#d8e0e8"/>
+      <stop offset="1" stop-color="#aebac7"/>
+    </linearGradient>
+  </defs>
+  <rect x="177" y="187" width="896" height="880" rx="144" fill="#1b242d" stroke="url(#silver-rim)" stroke-width="21"/>
+  <path fill="#2474ff" d="
+    M 266 395
+    L 795 348 Q 809 347 803 360
+    L 777 414 Q 772 424 761 425
+    L 513 448 Q 499 449 505 462
+    L 621 735 Q 628 749 635 735
+    L 705 573 C 726 526 764 503 813 503
+    H 922 Q 935 503 929 515
+    L 907 560 Q 903 569 894 569
+    H 832 C 811 569 796 580 786 598
+    L 651 891 Q 647 898 640 898
+    H 611 Q 603 898 600 891
+    L 410 471 Q 405 460 396 461
+    L 241 475 Q 222 477 228 462
+    L 256 406 Q 260 396 266 395
+    Z"/>
+  <rect x="779" y="805" width="92" height="93" rx="8" fill="url(#silver-cursor)"/>
+</svg>

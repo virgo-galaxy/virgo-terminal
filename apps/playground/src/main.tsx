@@ -11,6 +11,7 @@ import '@virgo-design/themes/virgo.css';
 import '@virgo-design/ui/styles.css';
 import '@virgo-terminal/react/styles.css';
 import './playground.css';
+import terminalLogo from './assets/virgo-terminal-logo.svg';
 import { LocalShell } from './LocalShell';
 
 const prompt = '[root@localhost] # ~ ';
@@ -158,6 +159,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
   return (
     <>
       <header className="toolbar">
+        <img src={terminalLogo} alt="Virgo Terminal" width={24} height={24} />
         <SegmentedControl
           aria-label="Playground view"
           size="small"
