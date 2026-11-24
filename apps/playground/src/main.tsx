@@ -1,7 +1,7 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { monoFonts } from '@virgo-design/fonts';
-import { SettingsIcon } from '@virgo-design/icons';
+import { ArrowUpIcon, SettingsIcon } from '@virgo-design/icons';
 import { Button, Drawer, SegmentedControl, Select, Separator, Switch } from '@virgo-design/ui';
 import { Terminal, type TerminalAppearance, type TerminalHandle, type TerminalScrollbar } from '@virgo-terminal/react';
 import '@virgo-design/fonts/sans/inter.css';
@@ -100,6 +100,7 @@ function formatLogLine(sequence: number, time = new Date()) {
 
 function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback }: DemoTerminalProps) {
   const terminal = useRef<TerminalHandle>(null);
+  const [canScrollUp, setCanScrollUp] = useState(false);
 
   useEffect(() => {
     let line = initialLogCount;
@@ -111,23 +112,43 @@ function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback }: Demo
   }, []);
 
   return (
-    <Terminal
-      appearance={appearance}
-      autoFit
-      className="terminal"
-      copyOnSelect={copyOnSelect}
-      readOnly
-      ref={terminal}
-      scrollbar={scrollbar}
-      scrollback={scrollback}
-      onReady={() => {
-        const now = Date.now();
-        const history = Array.from({ length: initialLogCount }, (_, index) => (
-          formatLogLine(index + 1, new Date(now - (initialLogCount - index) * logIntervalMs))
-        )).join('');
-        terminal.current?.write(`\x1b[?25l${history}`);
-      }}
-    />
+    <div className="simulated-logs">
+      <Terminal
+        appearance={appearance}
+        autoFit
+        className="terminal"
+        copyOnSelect={copyOnSelect}
+        readOnly
+        ref={terminal}
+        scrollbar={scrollbar}
+        scrollback={scrollback}
+        onReady={(xterm) => {
+          xterm.onRender(() => setCanScrollUp(xterm.buffer.active.viewportY > 0));
+          const now = Date.now();
+          const history = Array.from({ length: initialLogCount }, (_, index) => (
+            formatLogLine(index + 1, new Date(now - (initialLogCount - index) * logIntervalMs))
+          )).join('');
+          xterm.write(`\x1b[?25l${history}`);
+        }}
+      />
+      {canScrollUp && (
+        <Button
+          type="button"
+          className="logs-back-to-top"
+          variant="secondary"
+          size="small"
+          iconOnly
+          aria-label="Back to top"
+          title="Back to top"
+          onClick={() => {
+            terminal.current?.focus();
+            terminal.current?.scrollToTop();
+          }}
+        >
+          <ArrowUpIcon aria-hidden="true" />
+        </Button>
+      )}
+    </div>
   );
 }
 

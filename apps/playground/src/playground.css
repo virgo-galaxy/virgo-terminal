@@ -85,6 +85,22 @@ body {
   height: 100%;
 }
 
+.simulated-logs {
+  position: relative;
+  height: 100%;
+}
+
+.simulated-logs > .terminal {
+  isolation: isolate;
+}
+
+.logs-back-to-top {
+  position: absolute;
+  z-index: 1;
+  inset-inline-end: var(--vd-spacing-16);
+  inset-block-end: var(--vd-spacing-8);
+}
+
 .local-shell:not([hidden]) {
   display: flex;
   flex-direction: column;

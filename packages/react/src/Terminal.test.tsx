@@ -20,6 +20,7 @@ const { TerminalMock, terminals, fit, disposeFit } = vi.hoisted(() => {
     write = vi.fn<Xterm['write']>();
     refresh = vi.fn<Xterm['refresh']>();
     focus = vi.fn();
+    scrollToTop = vi.fn();
     dispose = vi.fn(() => this.element.remove());
     loadAddon = vi.fn();
     attachCustomKeyEventHandler = vi.fn<Xterm['attachCustomKeyEventHandler']>();
@@ -117,7 +118,7 @@ afterEach(() => {
 });
 
 describe('Terminal', () => {
-  it('opens before onReady and forwards writes and focus through the ref', () => {
+  it('opens before onReady and forwards writes, focus, and scrolling through the ref', () => {
     const ref = createRef<TerminalHandle>();
     const onReady = vi.fn((terminal: Xterm) => {
       expect(container.contains(terminal.element ?? null)).toBe(true);
@@ -129,10 +130,12 @@ describe('Terminal', () => {
 
     ref.current?.write(data, onWrite);
     ref.current?.focus();
+    ref.current?.scrollToTop();
 
     expect(onReady).toHaveBeenCalledExactlyOnceWith(terminal);
     expect(terminal.write).toHaveBeenCalledExactlyOnceWith(data, onWrite);
     expect(terminal.focus).toHaveBeenCalledTimes(1);
+    expect(terminal.scrollToTop).toHaveBeenCalledTimes(1);
     expect(ref.current?.getSize()).toEqual({ cols: 80, rows: 24 });
   });
 

@@ -28,6 +28,8 @@ export interface TerminalHandle {
   write: Xterm['write'];
   getSize(): TerminalSize | null;
   focus(): void;
+  /** Scroll to the first retained line. */
+  scrollToTop(): void;
 }
 
 export interface TerminalProps {
@@ -114,6 +116,9 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     },
     focus() {
       instance.current?.focus();
+    },
+    scrollToTop() {
+      instance.current?.scrollToTop();
     },
   }), []);
 
