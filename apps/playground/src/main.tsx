@@ -1,7 +1,7 @@
 import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { monoFonts } from '@virgo-design/fonts';
-import { CodeIcon, MonitorIcon, SettingsIcon } from '@virgo-design/icons';
+import { CodeIcon, GithubIcon, MonitorIcon, SettingsIcon } from '@virgo-design/icons';
 import { Button, Drawer, SegmentedControl, Select, Separator, Switch } from '@virgo-design/ui';
 import type { TerminalAppearance, TerminalScrollbar } from '@virgo-terminal/react';
 import '@virgo-design/fonts/sans/inter.css';
@@ -157,6 +157,17 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
             <SegmentedControl.Item value="preview" icon={<MonitorIcon />}>Preview</SegmentedControl.Item>
             <SegmentedControl.Item value="code" icon={<CodeIcon />}>Code</SegmentedControl.Item>
           </SegmentedControl>
+          <Button
+            type="button"
+            size="small"
+            variant="outline"
+            iconOnly
+            aria-label="GitHub repository"
+            title="GitHub"
+            onClick={() => window.open('https://github.com/virgo-galaxy/virgo-terminal', '_blank', 'noopener,noreferrer')}
+          >
+            <GithubIcon aria-hidden="true" />
+          </Button>
           <Drawer>
             <Drawer.Trigger
               render={(props) => (
