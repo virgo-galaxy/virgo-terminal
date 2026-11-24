@@ -126,6 +126,9 @@ function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback, showBa
         scrollback={scrollback}
         onReady={(xterm) => {
           xterm.onRender(() => setCanScrollUp(xterm.buffer.active.viewportY > 0));
+          xterm.onSelectionChange(() => {
+            if (xterm.hasSelection() && !xterm.getSelection()) xterm.clearSelection();
+          });
           const now = Date.now();
           const history = Array.from({ length: initialLogCount }, (_, index) => (
             formatLogLine(index + 1, new Date(now - (initialLogCount - index) * logIntervalMs))
