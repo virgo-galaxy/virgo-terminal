@@ -26,8 +26,17 @@ body {
   gap: var(--vd-spacing-8);
 }
 
-.preferences {
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--vd-spacing-8);
   margin-inline-start: auto;
+}
+
+.presentation-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vd-spacing-4);
 }
 
 .preferences-body {
