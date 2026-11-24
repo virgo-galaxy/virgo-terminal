@@ -1,2 +1,2 @@
 export { Terminal } from './Terminal.js';
-export type { TerminalAppearance, TerminalHandle, TerminalProps, TerminalSize } from './Terminal.js';
+export type { TerminalAppearance, TerminalHandle, TerminalProps, TerminalScrollbar, TerminalSize } from './Terminal.js';

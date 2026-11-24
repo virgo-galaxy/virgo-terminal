@@ -1,6 +1,6 @@
 import * as fitAddon from '@xterm/addon-fit';
 import * as xterm from '@xterm/xterm';
-import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, type CSSProperties } from 'react';
 
 type Xterm = xterm.Terminal;
 
@@ -13,6 +13,15 @@ export type TerminalAppearance = Pick<xterm.ITerminalOptions, 'fontFamily' | 'fo
 export interface TerminalSize {
   cols: number;
   rows: number;
+}
+
+export interface TerminalScrollbar {
+  /** Painted width in CSS pixels. The native drag area keeps its full width. */
+  thumbWidth?: number;
+  /** Corner radius in CSS pixels. */
+  thumbRadius?: number;
+  /** Defaults to xterm's automatic visibility. Hiding the bar preserves wheel scrolling. */
+  visibility?: 'auto' | 'hidden';
 }
 
 export interface TerminalHandle {
@@ -32,6 +41,7 @@ export interface TerminalProps {
   onReady?: (terminal: Xterm) => void;
   onResize?: (size: TerminalSize) => void;
   readOnly?: boolean;
+  scrollbar?: TerminalScrollbar;
   /** Return false to skip xterm.js handling of this keyboard event. */
   shouldHandleKeyEvent?: (event: KeyboardEvent) => boolean;
 }
@@ -46,6 +56,7 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     onReady,
     onResize,
     readOnly = false,
+    scrollbar,
     shouldHandleKeyEvent,
   },
   ref,
@@ -205,5 +216,22 @@ export const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Termi
     };
   }, [autoFit]);
 
-  return <div ref={container} className={className} />;
+  const { thumbWidth, thumbRadius } = scrollbar ?? {};
+  const scrollbarStyle = scrollbar && {
+    '--virgo-terminal-thumb-width': thumbWidth !== undefined && Number.isFinite(thumbWidth)
+      ? `${Math.max(1, thumbWidth)}px`
+      : undefined,
+    '--virgo-terminal-thumb-radius': thumbRadius !== undefined && Number.isFinite(thumbRadius)
+      ? `${Math.max(0, thumbRadius)}px`
+      : undefined,
+  } as CSSProperties;
+
+  return (
+    <div
+      ref={container}
+      className={className}
+      data-virgo-terminal-scrollbar={scrollbar && (scrollbar.visibility ?? 'auto')}
+      style={scrollbarStyle}
+    />
+  );
 });

@@ -1,1 +1,13 @@
 @import '@xterm/xterm/css/xterm.css';
+
+[data-virgo-terminal-scrollbar] > .xterm .xterm-scrollable-element > .scrollbar.vertical > .slider {
+  --virgo-terminal-thumb-inset: max(0px, calc((100% - var(--virgo-terminal-thumb-width, 100%)) / 2));
+  box-sizing: border-box;
+  padding-inline: var(--virgo-terminal-thumb-inset);
+  border-radius: calc(var(--virgo-terminal-thumb-radius, 0px) + var(--virgo-terminal-thumb-inset)) / var(--virgo-terminal-thumb-radius, 0px);
+  background-clip: content-box;
+}
+
+[data-virgo-terminal-scrollbar='hidden'] > .xterm .xterm-scrollable-element > .scrollbar.vertical {
+  visibility: hidden;
+}

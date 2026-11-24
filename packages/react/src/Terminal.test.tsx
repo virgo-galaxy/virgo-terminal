@@ -224,6 +224,28 @@ describe('Terminal', () => {
     expect(terminals).toHaveLength(1);
   });
 
+  it('updates scrollbar presentation in place and restores native styling when omitted', () => {
+    render(<Terminal />);
+    const terminal = getTerminal();
+    const viewport = terminal.element.parentElement;
+    if (!viewport) throw new Error('The terminal did not open');
+
+    expect(viewport.hasAttribute('data-virgo-terminal-scrollbar')).toBe(false);
+    render(<Terminal scrollbar={{ thumbWidth: 6, thumbRadius: 3 }} />);
+    expect(viewport.getAttribute('data-virgo-terminal-scrollbar')).toBe('auto');
+    expect(viewport.style.getPropertyValue('--virgo-terminal-thumb-width')).toBe('6px');
+    expect(viewport.style.getPropertyValue('--virgo-terminal-thumb-radius')).toBe('3px');
+
+    render(<Terminal scrollbar={{ visibility: 'hidden' }} />);
+    expect(viewport.getAttribute('data-virgo-terminal-scrollbar')).toBe('hidden');
+    expect(viewport.style.getPropertyValue('--virgo-terminal-thumb-width')).toBe('');
+    expect(viewport.style.getPropertyValue('--virgo-terminal-thumb-radius')).toBe('');
+
+    render(<Terminal />);
+    expect(viewport.hasAttribute('data-virgo-terminal-scrollbar')).toBe(false);
+    expect(terminals).toHaveLength(1);
+  });
+
   it('only copies text on a completed left selection when copyOnSelect is enabled', () => {
     const writeText = vi.fn<(text: string) => Promise<void>>().mockResolvedValue(undefined);
     Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText } });
