@@ -1,12 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
-import type { DemoTerminalProps } from './demo-terminal-props';
-
-const prompt = '[root@localhost] # ~ ';
-const loadedAt = new Date();
-const loginDate = loadedAt.toDateString().slice(0, 10);
-const loginTime = loadedAt.toTimeString().slice(0, 8);
-const loginMessage = `Last login: ${loginDate} ${loginTime} on ttys001`;
+import type { DemoTerminalProps } from '@/examples/types';
+import { loginMessage, prompt } from './fixtures';
 
 export function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrollback, visible }: DemoTerminalProps & {
   visible: boolean;

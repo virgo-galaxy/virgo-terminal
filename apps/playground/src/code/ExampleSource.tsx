@@ -1,22 +1,8 @@
 import { useState } from 'react';
 import { ChevronDownIcon } from '@virgo-design/icons';
 import { Menu } from '@virgo-design/ui';
-import interactiveTerminalSource from './InteractiveTerminal.tsx?raw';
-import simulatedLogsSource from './SimulatedLogs.tsx?raw';
-import localShellSource from './LocalShell.tsx?raw';
-import localShellServerSource from '../vite.config.ts?raw';
-
-export type ExampleView = 'terminal' | 'logs' | 'shell';
-
-const exampleFiles = {
-  terminal: { name: 'InteractiveTerminal.tsx', source: interactiveTerminalSource },
-  logs: { name: 'SimulatedLogs.tsx', source: simulatedLogsSource },
-};
-
-const shellFiles = {
-  client: { name: 'LocalShell.tsx', source: localShellSource },
-  server: { name: 'vite.config.ts', source: localShellServerSource },
-};
+import type { ExampleView } from '@/examples/types';
+import { exampleFiles, shellFiles } from './example-sources';
 
 export function ExampleSource({ view }: { view: ExampleView }) {
   const [shellFile, setShellFile] = useState<keyof typeof shellFiles>('client');

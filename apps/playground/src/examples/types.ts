@@ -6,3 +6,6 @@ export type DemoTerminalProps = {
   scrollbar: TerminalScrollbar;
   scrollback: number;
 };
+
+export type ExampleView = 'terminal' | 'logs' | 'shell';
+export type Presentation = 'preview' | 'code';
