@@ -39,20 +39,20 @@ importers:
   apps/playground:
     dependencies:
       '@virgo-design/fonts':
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.1.1
+        version: 0.1.1
       '@virgo-design/icons':
-        specifier: 0.1.0
-        version: 0.1.0(react@19.3.1)
+        specifier: 0.1.1
+        version: 0.1.1(react@19.3.1)
       '@virgo-design/themes':
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.1.1
+        version: 0.1.1
       '@virgo-design/tokens':
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.1.1
+        version: 0.1.1
       '@virgo-design/ui':
-        specifier: 0.1.0
-        version: 0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 0.1.1
+        version: 0.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@virgo-terminal/react':
         specifier: workspace:*
         version: link:../../packages/react
@@ -593,31 +593,31 @@ packages:
     resolution: {integrity: sha512-k4lsFVpRZICbltkIEEH4hZRkwXkqDF1GHBpClKQOHQY+RkoZAAuyc1ci3I6p+CB6v3U4jaHIUshc4RzzQXZWLg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@virgo-design/colors@0.1.0':
-    resolution: {integrity: sha512-H+l9rX80pjkUW8S8r5Uzb8pK7XqGtPNiknhNmXYlhekI9yn4O4sWGZvEDw1NsO/OILO52bpkxNnJthqiTUIgvw==}
+  '@virgo-design/colors@0.1.1':
+    resolution: {integrity: sha512-Fz11yn4USajj7n8mnpSRSw0Yk996fRJ4cc369m6zjeQO4b//dJoGKEPGXSa5UM4jtD+pyWrfF0kO6j759NdZzg==}
 
-  '@virgo-design/fonts@0.1.0':
-    resolution: {integrity: sha512-LFRTltnXjiS8+Ip+J9FPcIEfAgl8b+ZgtLy5oZ65vUxPe8pl/Q72Q3E0URScLbsKR3LhEGEGAHHDlTeGPUMdXw==}
+  '@virgo-design/fonts@0.1.1':
+    resolution: {integrity: sha512-CMdOsURg12Vvrfgoqxha24097qZhtf9EIhkD7bjgtzkucuKu+GqrPoj5iYf38h9+hd9Mff+YQLdxBVLJ8D6KmQ==}
 
-  '@virgo-design/icons@0.1.0':
-    resolution: {integrity: sha512-7ugpRJT0RtURA/vgrFUiibEx5M0G0BjuEDv/pA1nrqeGk+s9iemwVkGuy2WuZyhlmuvMq+Zw8xceoH88vogzUg==}
+  '@virgo-design/icons@0.1.1':
+    resolution: {integrity: sha512-estczJv3XbA8U/F1WgBbjuxqywvbMwy2GUo/CsxhZB2obUyk0VYxlD1n7G1PirwASuRPJAbaL25UtMG4hATM7Q==}
     peerDependencies:
       react: '>=18.0.0'
 
-  '@virgo-design/primitives@0.1.0':
-    resolution: {integrity: sha512-iV2f6P1GpoSUZNe+dFwT/Zv8SWYTjO75r5hpA6NZ5yVk0xDb/WUzjV+pz1u6bW904Soq7uUi9uV8XBPcrH2NOA==}
+  '@virgo-design/primitives@0.1.1':
+    resolution: {integrity: sha512-k82QC9D4KCoB1GvPawFzQGyT5jHRx1l2t5oXwiP4lEDIxa+IKE/nCrJhgznf7RQ/VF1mGHoFd/f+nqO+3MOcTw==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@virgo-design/themes@0.1.0':
-    resolution: {integrity: sha512-uopNO+qCXSB9FkWAKfhe2pgG1SlaXlohGjNYVT28LZJ5T8BErF2bEyb/OS0FWXZoT9/eZpTu+cV3Twix1AN1Pg==}
+  '@virgo-design/themes@0.1.1':
+    resolution: {integrity: sha512-sAOW8qGe1Vo1xNfkFB4t1gJ1MuvwFYy+VpQ601iEijps3Zo0kUxqSmNzeZfNfUB//nkTUW8hnLrrrSKwhOTESQ==}
 
-  '@virgo-design/tokens@0.1.0':
-    resolution: {integrity: sha512-GSdsEJzzNXEe+St5amGYHHXSWO4siKdaoY1CLThNmXBGmFXJs7A8sLJy4NxaKPqq65ZoMg8B7LnVRpdEc2RdlA==}
+  '@virgo-design/tokens@0.1.1':
+    resolution: {integrity: sha512-is9G8EsiMoxCtDnGhy/CFulIGgxnjh5JsKIhUIYBwqXBuQ4pnvmz4/Z4MWsFCuxHmE+XfIB4cC7JnwHIlBGbIA==}
 
-  '@virgo-design/ui@0.1.0':
-    resolution: {integrity: sha512-WAaokQZ+vp5tgVFCdxG+vE5TBo7JnO/r1qp+sW0lFLM1iFRJI2F0qJTymuvp56OpZqZoRQB5txU8PD2n7AJnvQ==}
+  '@virgo-design/ui@0.1.1':
+    resolution: {integrity: sha512-jE8Nc8yDzq2Dm/BllfXnM7Y8276kxKwilWEcn2ZVkh9FBOk4imRhltCrlaHu5eVPrqREUdtFedDzd2KsIQgxAw==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -1845,9 +1845,9 @@ snapshots:
       '@typescript-eslint/types': 8.73.0
       eslint-visitor-keys: 5.0.1
 
-  '@virgo-design/colors@0.1.0': {}
+  '@virgo-design/colors@0.1.1': {}
 
-  '@virgo-design/fonts@0.1.0':
+  '@virgo-design/fonts@0.1.1':
     dependencies:
       '@fontsource-variable/figtree': 5.3.0
       '@fontsource-variable/geist-mono': 5.3.0
@@ -1865,29 +1865,29 @@ snapshots:
       '@fontsource-variable/red-hat-mono': 5.3.0
       '@fontsource-variable/source-code-pro': 5.3.1
 
-  '@virgo-design/icons@0.1.0(react@19.3.1)':
+  '@virgo-design/icons@0.1.1(react@19.3.1)':
     dependencies:
       react: 19.3.1
 
-  '@virgo-design/primitives@0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@virgo-design/primitives@0.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@virgo-design/themes@0.1.0':
+  '@virgo-design/themes@0.1.1':
     dependencies:
-      '@virgo-design/tokens': 0.1.0
+      '@virgo-design/tokens': 0.1.1
 
-  '@virgo-design/tokens@0.1.0':
+  '@virgo-design/tokens@0.1.1':
     dependencies:
-      '@virgo-design/colors': 0.1.0
-      '@virgo-design/fonts': 0.1.0
+      '@virgo-design/colors': 0.1.1
+      '@virgo-design/fonts': 0.1.1
 
-  '@virgo-design/ui@0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@virgo-design/ui@0.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@virgo-design/icons': 0.1.0(react@19.3.1)
-      '@virgo-design/primitives': 0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@virgo-design/tokens': 0.1.0
+      '@virgo-design/icons': 0.1.1(react@19.3.1)
+      '@virgo-design/primitives': 0.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@virgo-design/tokens': 0.1.1
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 

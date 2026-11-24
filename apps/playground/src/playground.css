@@ -33,12 +33,6 @@ body {
   margin-inline-start: auto;
 }
 
-.presentation-label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--vd-spacing-4);
-}
-
 .preferences-body {
   display: flex;
   flex-direction: column;

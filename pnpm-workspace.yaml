@@ -5,3 +5,12 @@ packages:
 allowBuilds:
   esbuild: true
   node-pty: true
+
+minimumReleaseAgeExclude:
+  - '@virgo-design/colors@0.1.1'
+  - '@virgo-design/fonts@0.1.1'
+  - '@virgo-design/icons@0.1.1'
+  - '@virgo-design/primitives@0.1.1'
+  - '@virgo-design/themes@0.1.1'
+  - '@virgo-design/tokens@0.1.1'
+  - '@virgo-design/ui@0.1.1'

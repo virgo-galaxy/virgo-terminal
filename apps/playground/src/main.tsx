@@ -154,18 +154,8 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
             value={presentation}
             onValueChange={(value) => selectExample(view, value === 'code' ? 'code' : 'preview')}
           >
-            <SegmentedControl.Item value="preview">
-              <span className="presentation-label">
-                <MonitorIcon size={14} aria-hidden="true" />
-                Preview
-              </span>
-            </SegmentedControl.Item>
-            <SegmentedControl.Item value="code">
-              <span className="presentation-label">
-                <CodeIcon size={14} aria-hidden="true" />
-                Code
-              </span>
-            </SegmentedControl.Item>
+            <SegmentedControl.Item value="preview" icon={<MonitorIcon />}>Preview</SegmentedControl.Item>
+            <SegmentedControl.Item value="code" icon={<CodeIcon />}>Code</SegmentedControl.Item>
           </SegmentedControl>
           <Drawer>
             <Drawer.Trigger
