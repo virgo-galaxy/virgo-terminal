@@ -67,7 +67,7 @@ body {
   font-size: var(--vd-typography-ui-label-medium-font-size);
 }
 
-.copy-on-select {
+.preference-switch {
   flex-direction: row-reverse;
   justify-content: space-between;
 }

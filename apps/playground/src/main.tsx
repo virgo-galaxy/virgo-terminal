@@ -98,7 +98,9 @@ function formatLogLine(sequence: number, time = new Date()) {
   return `${timestamp}  ${level}  ${method.padEnd(5)}  ${path.padEnd(17)}  ${status}  ${latency}${message}\r\n`;
 }
 
-function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback }: DemoTerminalProps) {
+function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback, showBackToTop }: DemoTerminalProps & {
+  showBackToTop: boolean;
+}) {
   const terminal = useRef<TerminalHandle>(null);
   const [canScrollUp, setCanScrollUp] = useState(false);
 
@@ -131,7 +133,7 @@ function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback }: Demo
           xterm.write(`\x1b[?25l${history}`);
         }}
       />
-      {canScrollUp && (
+      {showBackToTop && canScrollUp && (
         <Button
           type="button"
           className="logs-back-to-top"
@@ -194,6 +196,7 @@ const defaultPreferences = {
   scrollbarRadius: '3',
   history: '1000',
   copyOnSelect: false,
+  showBackToTop: false,
   shellId: defaultShellOption.id,
 };
 
@@ -210,6 +213,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
   const [scrollbarRadius, setScrollbarRadius] = useState(defaultPreferences.scrollbarRadius);
   const [history, setHistory] = useState(defaultPreferences.history);
   const [copyOnSelect, setCopyOnSelect] = useState(defaultPreferences.copyOnSelect);
+  const [showBackToTop, setShowBackToTop] = useState(defaultPreferences.showBackToTop);
   const appearance = { fontFamily: fonts[font].family, fontSize: Number(fontSize), theme: themes[theme].colors };
   const demoTerminalProps: DemoTerminalProps = {
     appearance,
@@ -248,6 +252,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
     setScrollbarRadius(defaultPreferences.scrollbarRadius);
     setHistory(defaultPreferences.history);
     setCopyOnSelect(defaultPreferences.copyOnSelect);
+    setShowBackToTop(defaultPreferences.showBackToTop);
     setShellId(defaultPreferences.shellId);
   }
 
@@ -356,8 +361,11 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
                 <Separator decorative />
                 <section className="preferences-section" aria-labelledby="settings-heading">
                   <h3 id="settings-heading">Settings</h3>
-                  <Switch className="copy-on-select" checked={copyOnSelect} onCheckedChange={setCopyOnSelect}>
+                  <Switch className="preference-switch" checked={copyOnSelect} onCheckedChange={setCopyOnSelect}>
                     Copy on select
+                  </Switch>
+                  <Switch className="preference-switch" checked={showBackToTop} onCheckedChange={setShowBackToTop}>
+                    Back to top in logs
                   </Switch>
                   <div className="preference-field">
                     <span id="history-label">History</span>
@@ -401,7 +409,7 @@ function Playground({ initialFont }: { initialFont: keyof typeof fonts }) {
       </header>
       <main className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
         {view === 'terminal' && <InteractiveTerminal {...demoTerminalProps} />}
-        {view === 'logs' && <SimulatedLogs {...demoTerminalProps} />}
+        {view === 'logs' && <SimulatedLogs {...demoTerminalProps} showBackToTop={showBackToTop} />}
         {import.meta.env.DEV && shellSession && (
           <LocalShell
             key={shellSession.attempt}
