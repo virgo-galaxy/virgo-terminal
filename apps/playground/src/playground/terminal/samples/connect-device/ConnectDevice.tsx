@@ -25,6 +25,8 @@ export function ConnectDevice({ options, ticket, visible }: {
   const { status, connect, start, sendInput, sendSize } = useDeviceConnection(ticket, terminal);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [downloadError, setDownloadError] = useState<'unavailable' | 'failed' | null>(null);
+  const needsSetup = status === 'idle' || status === 'failed' || status === 'denied';
+  const hasLaunchTicket = status === 'idle' && ticket !== null;
 
   useEffect(() => {
     if (visible && status === 'connected') terminal.current?.focus();
@@ -49,19 +51,16 @@ export function ConnectDevice({ options, ticket, visible }: {
 
   return (
     <section className={styles.root} hidden={!visible} aria-label={t('toolbar.connectDevice')}>
-      {status === 'idle' ? (
+      {needsSetup ? (
         <div className={styles.setup}>
           <h1>{t('toolbar.connectDevice')}</h1>
-          {ticket ? (
+          <p>{t(hasLaunchTicket ? 'connectDevice.authorize' : 'connectDevice.instructions')}</p>
+          <Button type="button" leadingIcon={<MonitorIcon aria-hidden="true" />} onClick={connect}>
+            {t('connectDevice.connect')}
+          </Button>
+          {status !== 'idle' && <p className={styles.availability} role="status">{t(`connectDevice.${status}`)}</p>}
+          {!hasLaunchTicket && (
             <>
-              <p>{t('connectDevice.authorize')}</p>
-              <Button type="button" leadingIcon={<MonitorIcon aria-hidden="true" />} onClick={connect}>
-                {t('connectDevice.connect')}
-              </Button>
-            </>
-          ) : (
-            <>
-              <p>{t('connectDevice.instructions')}</p>
               <ul className={styles.downloads}>
                 {downloads.map(({ label, filename, icon: PlatformIcon }) => (
                   <li key={filename}>
@@ -123,7 +122,7 @@ export function ConnectDevice({ options, ticket, visible }: {
           {status !== 'connected' && (
             <div className={styles.status}>
               <span role="status">{t(`connectDevice.${status}`)}</span>
-              {status !== 'connecting' && (
+              {status === 'exited' && (
                 <Button type="button" size="small" onClick={connect}>{t('connectDevice.retry')}</Button>
               )}
             </div>

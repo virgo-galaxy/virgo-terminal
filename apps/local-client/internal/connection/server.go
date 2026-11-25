@@ -13,20 +13,22 @@ import (
 )
 
 const protocol = "virgo-terminal.v1"
+const approvalDenied = websocket.StatusCode(4001)
 
 type Server struct {
 	ctx     context.Context
 	origin  string
 	address string
 	pairing *pairing
+	approve func(context.Context, string) bool
 }
 
-func New(ctx context.Context, origin, address string) (*Server, string, error) {
+func New(ctx context.Context, origin, address string, approve func(context.Context, string) bool) (*Server, string, error) {
 	pairing, err := newPairing()
 	if err != nil {
 		return nil, "", err
 	}
-	return &Server{ctx: ctx, origin: origin, address: address, pairing: pairing}, pairing.launch, nil
+	return &Server{ctx: ctx, origin: origin, address: address, pairing: pairing, approve: approve}, pairing.launch, nil
 }
 
 func (s *Server) Expired() bool { return s.pairing.expired() }
@@ -72,11 +74,23 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	startCtx, stopStart := context.WithTimeout(s.ctx, 10*time.Second)
 	err = wsjson.Read(startCtx, conn, &start)
 	stopStart()
-	if err != nil || start.Type != "start" || !start.validSize() || !s.pairing.claim(start.Key) {
+	if err != nil {
+		return
+	}
+	var sessionKey string
+	switch {
+	case s.approve != nil && start.Type == "pair" && s.pairing.reserve():
+		defer s.pairing.release()
+		if !s.approvePairing(conn, &start) {
+			return
+		}
+	case s.approve == nil && start.Type == "start" && start.validSize() && s.pairing.claim(start.Key):
+		defer s.pairing.release()
+		sessionKey = s.pairing.session
+	default:
 		_ = conn.Close(websocket.StatusPolicyViolation, "Invalid pairing or terminal size")
 		return
 	}
-	defer s.pairing.release()
 
 	ctx, stop := context.WithCancel(s.ctx)
 	defer stop()
@@ -98,7 +112,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	readyCtx, stopReady := context.WithTimeout(ctx, 10*time.Second)
-	err = wsjson.Write(readyCtx, conn, message{Type: "ready", Key: s.pairing.session})
+	err = wsjson.Write(readyCtx, conn, message{Type: "ready", Key: sessionKey})
 	stopReady()
 	if err != nil {
 		return
@@ -135,6 +149,30 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	_ = conn.Close(websocket.StatusNormalClosure, "Shell exited")
+}
+
+func (s *Server) approvePairing(conn *websocket.Conn, start *message) bool {
+	approvalCtx, stopApproval := context.WithTimeout(s.ctx, 30*time.Second)
+	defer stopApproval()
+	if wsjson.Write(approvalCtx, conn, message{Type: "awaiting-approval"}) != nil {
+		return false
+	}
+	if !s.approve(approvalCtx, s.origin) || approvalCtx.Err() != nil {
+		_ = conn.Close(approvalDenied, "Connection was not approved")
+		return false
+	}
+
+	// Wait for the approved tab to send its current size before opening a shell.
+	startCtx, stopStart := context.WithTimeout(s.ctx, 10*time.Second)
+	defer stopStart()
+	if wsjson.Write(startCtx, conn, message{Type: "approved"}) != nil || wsjson.Read(startCtx, conn, start) != nil {
+		return false
+	}
+	if start.Type != "start" || !start.validSize() {
+		_ = conn.Close(websocket.StatusPolicyViolation, "Invalid terminal size")
+		return false
+	}
+	return true
 }
 
 func sendInput(ctx context.Context, conn *websocket.Conn, terminal *shell.Session) {

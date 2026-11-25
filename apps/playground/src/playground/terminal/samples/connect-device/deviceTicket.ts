@@ -37,3 +37,11 @@ export function saveDeviceTicket({ port, key }: DeviceTicket) {
     // The open page can still reconnect with its in-memory credential.
   }
 }
+
+export function clearSavedDeviceTicket() {
+  try {
+    window.sessionStorage.removeItem(storageKey);
+  } catch {
+    // The current page can still forget its in-memory credential.
+  }
+}

@@ -37,7 +37,7 @@ export const enUS = {
   'preferences.restoreDefaults': 'Restore defaults',
   'logs.backToTop': 'Back to top',
   'shell.start': 'Start shell',
-  'connectDevice.instructions': 'Download and open the Virgo Terminal client to use this computer’s shell in the browser.',
+  'connectDevice.instructions': 'Open the Virgo Terminal client, then click Connect here. If the browser asks for access to this computer, choose Allow.',
   'connectDevice.macos': 'macOS Universal',
   'connectDevice.macOpenHelp': 'Can’t open the app?',
   'connectDevice.macOpenSettings': 'If macOS blocks the app you downloaded here, click Done, then go to System Settings → Privacy & Security → Open Anyway.',
@@ -51,8 +51,10 @@ export const enUS = {
   'connectDevice.authorize': 'Connect to the running Virgo Terminal client. If the browser asks for local access, choose Allow.',
   'connectDevice.connect': 'Connect',
   'connectDevice.connecting': 'Connecting to this computer…',
+  'connectDevice.authorizing': 'Allow the connection in the Virgo Terminal client to continue.',
   'connectDevice.exited': 'Shell exited.',
-  'connectDevice.failed': 'Could not connect. Check that the client is running and the browser allows local access.',
+  'connectDevice.failed': 'Could not connect. Check that the latest client is running and the browser allows local access.',
+  'connectDevice.denied': 'The connection was not approved in the client.',
   'connectDevice.retry': 'Reconnect',
 };
 
