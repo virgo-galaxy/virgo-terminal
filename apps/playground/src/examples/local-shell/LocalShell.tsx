@@ -21,7 +21,7 @@ export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, scr
   }, [ready, visible]);
 
   return (
-    <div className="terminal local-shell" hidden={!visible}>
+    <div className="demo-terminal local-shell" hidden={!visible}>
       <Terminal
         appearance={{ ...appearance, cursorBlink: true }}
         autoFit

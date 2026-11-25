@@ -31,7 +31,7 @@ export function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback,
       <Terminal
         appearance={appearance}
         autoFit
-        className="terminal"
+        className="demo-terminal"
         copyOnSelect={copyOnSelect}
         readOnly
         ref={terminal}

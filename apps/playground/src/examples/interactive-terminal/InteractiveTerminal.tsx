@@ -15,7 +15,7 @@ export function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrol
     <Terminal
       appearance={{ ...appearance, cursorBlink: true }}
       autoFit
-      className="terminal"
+      className="demo-terminal"
       copyOnSelect={copyOnSelect}
       ref={terminal}
       scrollbar={scrollbar}
