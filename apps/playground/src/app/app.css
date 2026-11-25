@@ -28,6 +28,19 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--vd-spacing-8);
+  min-inline-size: 0;
+}
+
+.toolbar-examples {
+  max-inline-size: 100%;
+}
+
+@media (max-width: 360px) {
+  .toolbar .toolbar-examples {
+    --vd-control-small-padding-inline: var(--vd-spacing-4);
+    --segmented-icon-size: var(--vd-sizing-12);
+    --segmented-gap: var(--vd-spacing-2);
+  }
 }
 
 .toolbar-actions {
