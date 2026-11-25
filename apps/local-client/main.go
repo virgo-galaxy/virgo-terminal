@@ -7,8 +7,8 @@ import (
 	"github.com/virgo-galaxy/virgo-terminal/apps/local-client/internal/client"
 )
 
-// Default for local development. Release builds can set main.playgroundURL with -ldflags.
-var playgroundURL = "http://127.0.0.1:3000/"
+// Local development can select a different page with --playground.
+var playgroundURL = "https://terminal.virgogalaxy.com/"
 
 func main() {
 	playground := flag.String("playground", playgroundURL, "Playground URL")
