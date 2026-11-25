@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { GithubIcon, LanguageIcon } from '@virgo-design/icons';
+import { useState, type ReactNode } from 'react';
+import { GithubIcon, LanguageIcon, MoonFilledIcon, SunFilledIcon } from '@virgo-design/icons';
 import { Button, Menu, SegmentedControl } from '@virgo-design/ui';
 import terminalLogo from '@/assets/virgo-terminal-logo.svg';
 import type { ExampleView } from '@/examples/types';
@@ -11,7 +11,14 @@ export function Toolbar({ view, onSelectExample, children }: {
   children: ReactNode;
 }) {
   const { locale, setLocale, t } = usePlaygroundLocale();
+  const [darkMode, setDarkMode] = useState(() => document.documentElement.dataset.theme === 'dark');
   const languageLabel = t('toolbar.language');
+  const colorModeLabel = t(darkMode ? 'toolbar.switchToLight' : 'toolbar.switchToDark');
+
+  function toggleColorMode() {
+    document.documentElement.dataset.theme = darkMode ? 'light' : 'dark';
+    setDarkMode(!darkMode);
+  }
 
   return (
     <header className="toolbar">
@@ -31,6 +38,17 @@ export function Toolbar({ view, onSelectExample, children }: {
         )}
       </SegmentedControl>
       <div className="toolbar-actions">
+        <Button
+          type="button"
+          size="small"
+          variant="outline"
+          iconOnly
+          aria-label={colorModeLabel}
+          title={colorModeLabel}
+          onClick={toggleColorMode}
+        >
+          {darkMode ? <SunFilledIcon aria-hidden="true" /> : <MoonFilledIcon aria-hidden="true" />}
+        </Button>
         <Menu size="small">
           <Menu.Trigger render={(props) => (
             <Button {...props} size="small" variant="outline" iconOnly aria-label={languageLabel} title={languageLabel}>

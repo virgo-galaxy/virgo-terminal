@@ -6,6 +6,8 @@ export const zhCN: Record<MessageKey, string> = {
   'toolbar.logs': '模拟日志',
   'toolbar.shell': '本地 Shell',
   'toolbar.language': '语言',
+  'toolbar.switchToLight': '切换到浅色模式',
+  'toolbar.switchToDark': '切换到深色模式',
   'toolbar.github': 'GitHub 仓库',
   'guide.loading': '正在加载指南…',
   'layout.resizeGuide': '调整指南栏宽度',

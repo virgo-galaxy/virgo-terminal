@@ -4,6 +4,8 @@ export const enUS = {
   'toolbar.logs': 'Simulated logs',
   'toolbar.shell': 'Local Shell',
   'toolbar.language': 'Language',
+  'toolbar.switchToLight': 'Switch to light mode',
+  'toolbar.switchToDark': 'Switch to dark mode',
   'toolbar.github': 'GitHub repository',
   'guide.loading': 'Loading guide…',
   'layout.resizeGuide': 'Resize guide panel',
