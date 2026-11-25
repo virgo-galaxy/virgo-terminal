@@ -1,7 +1,7 @@
 import { lazy, useEffect, useRef, useState } from 'react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import { Layout } from '@/layout/Layout';
-import { ConnectDevice, type ConnectDeviceHandle } from './terminal/samples/connect-device/ConnectDevice';
+import { ConnectDevice, ConnectDeviceGuide, type ConnectDeviceHandle } from './terminal/samples/connect-device/ConnectDevice';
 import { clearLaunchTicket, readDeviceTicket } from './terminal/samples/connect-device/deviceTicket';
 import { Terminal, type ShellSession } from './terminal/Terminal';
 import type { DemoTerminalProps } from './terminal/types';
@@ -18,7 +18,9 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
     return deviceTicket || requestedDevice ? 'connect-device' : 'terminal';
   });
   const { locale } = usePlaygroundLocale();
+  const isConnectDevice = view === 'connect-device';
   const content = useRef<HTMLDivElement>(null);
+  const terminalPane = useRef<HTMLDivElement>(null);
   const device = useRef<ConnectDeviceHandle>(null);
   const [shellSession, setShellSession] = useState<ShellSession | null>(null);
   const [preferences, setPreferences] = useState<TerminalPreferenceValues>(
@@ -55,19 +57,24 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
   return (
     <Layout
       containerRef={content}
+      terminalRef={terminalPane}
       header={(
         <Toolbar
           view={view}
           onSelectExample={selectExample}
           onConnectDevice={() => device.current?.connect()}
+          onFullscreen={document.fullscreenEnabled ? () => {
+            void terminalPane.current?.requestFullscreen().catch(console.error);
+          } : undefined}
           preferences={preferences}
           onPreferencesChange={(change) => setPreferences((current) => ({ ...current, ...change }))}
           onRestoreDefaults={() => setPreferences({ ...defaultPreferences, font: initialFont })}
         />
       )}
-      guide={view === 'connect-device' ? null : <Guide view={view} locale={locale} />}
+      guide={isConnectDevice ? <ConnectDeviceGuide /> : <Guide view={view} locale={locale} />}
       guideKey={view}
-      terminalStyle={view === 'connect-device' ? {} : { backgroundColor: appearance.theme.background }}
+      stacked={isConnectDevice}
+      terminalStyle={{ backgroundColor: isConnectDevice ? undefined : appearance.theme.background }}
       terminal={(
         <>
           <Terminal
@@ -77,7 +84,12 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
             shellSession={shellSession}
             onRestartShell={startShell}
           />
-          <ConnectDevice ref={device} options={demoTerminalProps} ticket={deviceTicket} visible={view === 'connect-device'} />
+          <ConnectDevice
+            ref={device}
+            options={demoTerminalProps}
+            ticket={deviceTicket}
+            visible={isConnectDevice}
+          />
         </>
       )}
     />

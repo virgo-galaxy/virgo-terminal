@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
-import { showLocalShellDemo } from '@/playground/views';
 
 export type ShellOption = { id: string; label: string };
 
-export function useShellOptions(defaultShellId: string) {
+export function useShellOptions(defaultShellId: string, enabled: boolean) {
   const [shellOptions, setShellOptions] = useState<ShellOption[]>(
     () => [{ id: defaultShellId, label: 'System default' }],
   );
 
   useEffect(() => {
-    if (!showLocalShellDemo) return;
+    if (!enabled) return;
 
     const request = new AbortController();
     void fetch('/local-shell/options', { signal: request.signal }).then(async (response) => {
@@ -19,7 +18,7 @@ export function useShellOptions(defaultShellId: string) {
       }
     }).catch(() => {});
     return () => request.abort();
-  }, []);
+  }, [enabled]);
 
   return shellOptions;
 }

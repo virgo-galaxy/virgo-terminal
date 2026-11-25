@@ -9,11 +9,13 @@ const minTerminalWidth = 320;
 const minTerminalRatio = 0.31;
 const resizeStep = 24;
 
-export function Layout({ containerRef, header, guide, guideKey, terminal, terminalStyle }: {
+export function Layout({ containerRef, terminalRef, header, guide, guideKey, stacked, terminal, terminalStyle }: {
   containerRef: RefObject<HTMLDivElement | null>;
+  terminalRef: RefObject<HTMLDivElement | null>;
   header: ReactNode;
   guide: ReactNode;
   guideKey: string;
+  stacked?: boolean;
   terminal: ReactNode;
   terminalStyle?: CSSProperties;
 }) {
@@ -65,6 +67,7 @@ export function Layout({ containerRef, header, guide, guideKey, terminal, termin
         <div
           className={styles.panels}
           data-single-pane={!guide || undefined}
+          data-stacked={stacked || undefined}
           ref={containerRef}
           style={{
             '--guide-min-width': `${minGuideWidth}px`,
@@ -74,32 +77,34 @@ export function Layout({ containerRef, header, guide, guideKey, terminal, termin
             '--guide-ratio': guideRatio,
           } as CSSProperties}
         >
-          <div className={styles.terminalFrame} style={terminalStyle}>{terminal}</div>
           {guide && (
             <>
-              <div
-                className={styles.paneDivider}
-                role="separator"
-                tabIndex={0}
-                aria-orientation="vertical"
-                aria-label={t('layout.resizeGuide')}
-                aria-controls="playground-guide"
-                aria-valuemin={minGuideRatio * 100}
-                aria-valuemax={100 - minTerminalRatio * 100}
-                aria-valuenow={Math.round(guideRatio * 100)}
-                onPointerDown={(event) => {
-                  if (event.button === 0) event.currentTarget.setPointerCapture(event.pointerId);
-                }}
-                onPointerMove={moveDivider}
-                onKeyDown={resizeWithKeyboard}
-              />
               <div className={styles.guideFrame} id="playground-guide" key={guideKey}>
                 <Suspense fallback={<p className={styles.guideLoading} role="status">{t('guide.loading')}</p>}>
                   {guide}
                 </Suspense>
               </div>
+              {!stacked && (
+                <div
+                  className={styles.paneDivider}
+                  role="separator"
+                  tabIndex={0}
+                  aria-orientation="vertical"
+                  aria-label={t('layout.resizeGuide')}
+                  aria-controls="playground-guide"
+                  aria-valuemin={minGuideRatio * 100}
+                  aria-valuemax={100 - minTerminalRatio * 100}
+                  aria-valuenow={Math.round(guideRatio * 100)}
+                  onPointerDown={(event) => {
+                    if (event.button === 0) event.currentTarget.setPointerCapture(event.pointerId);
+                  }}
+                  onPointerMove={moveDivider}
+                  onKeyDown={resizeWithKeyboard}
+                />
+              )}
             </>
           )}
+          <div ref={terminalRef} className={styles.terminalFrame} style={terminalStyle}>{terminal}</div>
         </div>
       </VirgoLayout.Content>
     </VirgoLayout>

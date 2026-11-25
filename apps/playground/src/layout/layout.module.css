@@ -78,8 +78,50 @@
   padding: var(--vd-spacing-8);
 }
 
+.terminalFrame:fullscreen {
+  background-color: var(--vd-surface-background);
+  border: 0;
+  border-radius: 0;
+}
+
+.panels[data-stacked] {
+  grid-template: "guide" max-content "terminal" clamp(15rem, 38dvh, 24rem) / minmax(0, 48rem);
+  align-content: start;
+  justify-content: center;
+  gap: var(--vd-spacing-20);
+  overflow: auto;
+  padding-block-end: var(--vd-spacing-16);
+}
+
+.panels[data-stacked] > .guideFrame {
+  overflow: visible;
+  border: 0;
+}
+
+.panels[data-stacked] > .terminalFrame {
+  view-transition-name: device-terminal;
+}
+
+.panels[data-stacked] > .terminalFrame:not(:fullscreen) {
+  background-color: var(--vd-surface-secondary);
+}
+
+.panels[data-stacked]:has(> .terminalFrame > [data-fill-terminal]:not([hidden])) {
+  grid-template: "terminal" minmax(0, 1fr) / minmax(0, 1fr);
+  padding-block-end: 0;
+}
+
+.panels[data-stacked]:has(> .terminalFrame > [data-fill-terminal]:not([hidden])) > .guideFrame {
+  display: none;
+}
+
+::view-transition-group(device-terminal) {
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
 @media (max-width: 900px) {
-  .panels:not([data-single-pane]) {
+  .panels:not([data-single-pane], [data-stacked]) {
     grid-template: "terminal" clamp(16rem, 43dvh, 24rem) "guide" auto / minmax(0, 1fr);
     align-content: start;
     gap: var(--vd-spacing-12);

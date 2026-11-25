@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import type { TerminalHandle, TerminalSize } from '@virgo-terminal/react';
-import { clearSavedDeviceTicket, saveDeviceTicket, type DeviceTicket } from './deviceTicket';
+import { clearSavedDeviceTicket, getBrowserKey, saveDeviceTicket, type DeviceTicket } from './deviceTicket';
 
 const devicePort = 43127; // Keep in sync with the desktop client's connection port.
 const approvalDenied = 4001;
 const retryIntervalMs = 2500;
 
-type Status = 'idle' | 'waiting' | 'connecting' | 'authorizing' | 'connected' | 'exited' | 'failed' | 'denied';
+type Status = 'idle' | 'waiting' | 'connecting' | 'authorizing' | 'starting' | 'connected' | 'exited' | 'failed' | 'denied';
 type BrowserAccess = PermissionState | 'checking' | 'manual';
 
 type Connection = {
   socket: WebSocket;
   automatic: boolean;
-  phase: 'opening' | 'authorizing' | 'approved' | 'started';
+  phase: 'opening' | 'authorizing' | 'approved' | 'started' | 'ready';
 };
 
 function useLoopbackAccess(enabled: boolean) {
@@ -50,8 +50,10 @@ export function useDeviceConnection(
   terminal: RefObject<TerminalHandle | null>,
   canConnect: boolean,
   visible: boolean,
+  transitionSession: (update: () => void) => void,
 ) {
   const [status, setStatus] = useState<Status>('idle');
+  const [connectInClient, setConnectInClient] = useState(false);
   const active = useRef<Connection | null>(null);
   const sessionKey = useRef(ticket?.key);
   const access = useLoopbackAccess(canConnect);
@@ -86,7 +88,6 @@ export function useDeviceConnection(
     const connection: Connection = { socket, automatic, phase: 'opening' };
     socket.binaryType = 'arraybuffer';
     active.current = connection;
-    if (!automatic) setStatus('connecting');
 
     socket.onopen = () => {
       if (active.current !== connection) return;
@@ -99,10 +100,11 @@ export function useDeviceConnection(
       setStatus('connecting');
       if (launchPort) {
         connection.phase = 'approved';
+        setStatus('starting');
         start();
       } else {
         connection.phase = 'authorizing';
-        socket.send(JSON.stringify({ type: 'pair' }));
+        socket.send(JSON.stringify({ type: 'pair', browserKey: getBrowserKey() }));
       }
     };
     socket.onmessage = ({ data }) => {
@@ -111,12 +113,14 @@ export function useDeviceConnection(
         terminal.current?.write(new Uint8Array(data));
       } else if (typeof data === 'string') {
         try {
-          const reply = JSON.parse(data) as { type?: unknown; key?: unknown } | null;
+          const reply = JSON.parse(data) as { type?: unknown; key?: unknown; connectInClient?: unknown } | null;
           if (connection.phase === 'authorizing' && reply?.type === 'awaiting-approval') {
+            setConnectInClient(reply.connectInClient === true);
             setStatus('authorizing');
           } else if (connection.phase === 'authorizing' && reply?.type === 'approved') {
+            setConnectInClient(reply.connectInClient === true);
             connection.phase = 'approved';
-            setStatus('connecting');
+            setStatus('starting');
             start();
           } else if (connection.phase === 'started' && reply?.type === 'ready') {
             if (launchPort) {
@@ -127,7 +131,8 @@ export function useDeviceConnection(
               sessionKey.current = reply.key;
               saveDeviceTicket({ port: launchPort, key: reply.key });
             }
-            setStatus('connected');
+            connection.phase = 'ready';
+            transitionSession(() => setStatus('connected'));
           }
         } catch {
           socket.close();
@@ -137,20 +142,27 @@ export function useDeviceConnection(
     socket.onclose = ({ code }) => {
       if (active.current !== connection) return;
       active.current = null;
-      if (code === 1000 && connection.phase !== 'opening') {
-        setStatus('exited');
-      } else {
-        if (launchPort) {
-          sessionKey.current = undefined;
-          clearSavedDeviceTicket();
-        }
-        if (connection.phase === 'opening') setStatus('waiting');
-        else setStatus(code === approvalDenied ? 'denied' : 'failed');
+      if (code === 1000 && connection.phase === 'ready') {
+        transitionSession(() => setStatus('exited'));
+        return;
       }
-    };
-  }, [canConnect, start, terminal, ticket]);
+      if (launchPort) {
+        sessionKey.current = undefined;
+        clearSavedDeviceTicket();
+      }
+      if (connection.phase === 'opening') {
+        setStatus((current) => current === 'idle' ? 'waiting' : current);
+        return;
+      }
 
-  const canWaitForClient = status === 'idle' || status === 'waiting';
+      const nextStatus = code === approvalDenied ? 'denied' : 'failed';
+      if (connection.phase === 'ready') transitionSession(() => setStatus(nextStatus));
+      else setStatus(nextStatus);
+    };
+  }, [canConnect, start, terminal, ticket, transitionSession]);
+
+  const canWaitForClient = status === 'idle' || status === 'waiting'
+    || (connectInClient && (status === 'exited' || status === 'denied' || status === 'failed'));
   useEffect(() => {
     if (!visible || !canConnect || access !== 'granted' || !canWaitForClient) return;
 
@@ -182,10 +194,10 @@ export function useDeviceConnection(
 
   function sendSize(size: TerminalSize) {
     const connection = active.current;
-    if (connection?.phase === 'started' && connection.socket.readyState === WebSocket.OPEN) {
+    if (connection?.phase === 'ready' && connection.socket.readyState === WebSocket.OPEN) {
       connection.socket.send(JSON.stringify({ type: 'resize', ...size }));
     }
   }
 
-  return { status, access, start, connect, sendInput, sendSize };
+  return { status, access, connectInClient, start, connect, sendInput, sendSize };
 }

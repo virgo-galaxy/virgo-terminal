@@ -3,7 +3,7 @@ import { Button, Drawer, Select, Separator, Switch } from '@virgo-design/ui';
 import type { CSSProperties } from 'react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import { useShellOptions } from '../../terminal/samples/local-shell/useShellOptions';
-import { showLocalShellDemo } from '../../views';
+import { ToolbarTooltip } from '../ToolbarTooltip';
 import {
   defaultPreferences, fonts, historyLimits, scrollbarRadii, scrollbarWidths, sizes, themes, type TerminalPreferenceValues,
 } from './preferences';
@@ -11,26 +11,30 @@ import styles from './preferences.module.css';
 
 const themeOptions = Object.keys(themes) as Array<keyof typeof themes>;
 
-export function TerminalPreferences({ preferences, onChange, onRestoreDefaults }: {
+export function TerminalPreferences({ showShellSelection, preferences, onChange, onRestoreDefaults }: {
+  showShellSelection: boolean;
   preferences: TerminalPreferenceValues;
   onChange: (change: Partial<TerminalPreferenceValues>) => void;
   onRestoreDefaults: () => void;
 }) {
   const { locale, t } = usePlaygroundLocale();
-  const shellOptions = useShellOptions(defaultPreferences.shellId);
+  const settingsLabel = t('toolbar.settings');
+  const shellOptions = useShellOptions(defaultPreferences.shellId, showShellSelection);
   const {
     font, fontSize, theme, scrollbarVisibility, scrollbarWidth, scrollbarRadius, history, copyOnSelect, showBackToTop, shellId,
   } = preferences;
 
   return (
     <Drawer>
-      <Drawer.Trigger
-        render={(props) => (
-          <Button {...props} className={styles.trigger!} size="small" variant="outline" iconOnly aria-label={t('preferences.title')}>
-            <SettingsIcon aria-hidden="true" />
-          </Button>
-        )}
-      />
+      <ToolbarTooltip label={settingsLabel}>
+        <Drawer.Trigger
+          render={(props) => (
+            <Button {...props} className={styles.trigger!} size="small" variant="outline" iconOnly aria-label={settingsLabel}>
+              <SettingsIcon aria-hidden="true" />
+            </Button>
+          )}
+        />
+      </ToolbarTooltip>
       <Drawer.Portal>
         <Drawer.Overlay />
         <Drawer.Content placement="right" size="sm" style={{ '--drawer-size': '22.5rem' } as CSSProperties}>
@@ -128,7 +132,7 @@ export function TerminalPreferences({ preferences, onChange, onRestoreDefaults }
                   </Select.Content>
                 </Select>
               </div>
-              {showLocalShellDemo && (
+              {showShellSelection && (
                 <>
                   <div className={styles.field}>
                     <span id="local-shell-label">{t('preferences.shell')}</span>

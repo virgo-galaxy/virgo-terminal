@@ -5,6 +5,21 @@ export interface DeviceTicket {
 
 const launchPrefix = '#connect-device=';
 const storageKey = 'virgo-terminal.device.v1';
+const browserKeyStorage = 'virgo-terminal.browser.v1';
+
+export function getBrowserKey() {
+  try {
+    const saved = window.localStorage.getItem(browserKeyStorage);
+    if (saved && /^[a-f0-9]{64}$/.test(saved)) return saved;
+
+    const bytes = crypto.getRandomValues(new Uint8Array(32));
+    const key = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+    window.localStorage.setItem(browserKeyStorage, key);
+    return key;
+  } catch {
+    return undefined;
+  }
+}
 
 function parseTicket(value: string): DeviceTicket | null {
   const match = /^(\d{1,5})\.([a-f0-9]{64})$/.exec(value);

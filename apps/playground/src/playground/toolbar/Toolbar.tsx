@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { CodeIcon, FileTextIcon, GithubIcon, LanguageIcon, MonitorIcon, MonitorPlugIcon, MoonFilledIcon, SunFilledIcon } from '@virgo-design/icons';
+import { CodeIcon, FileTextIcon, GithubIcon, LanguageIcon, MaximizeIcon, MonitorIcon, MonitorPlugIcon, MoonFilledIcon, SunFilledIcon } from '@virgo-design/icons';
 import { Button, Menu, SegmentedControl } from '@virgo-design/ui';
 import terminalLogo from '@/assets/virgo-terminal-logo.svg';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import { showLocalShellDemo, type PlaygroundView } from '../views';
 import type { TerminalPreferenceValues } from './preferences/preferences';
 import { TerminalPreferences } from './preferences/TerminalPreferences';
+import { ToolbarTooltip } from './ToolbarTooltip';
 import styles from './toolbar.module.css';
 
-export function Toolbar({ view, onSelectExample, onConnectDevice, preferences, onPreferencesChange, onRestoreDefaults }: {
+export function Toolbar({ view, onSelectExample, onConnectDevice, onFullscreen, preferences, onPreferencesChange, onRestoreDefaults }: {
   view: PlaygroundView;
   onSelectExample: (view: PlaygroundView) => void;
   onConnectDevice: () => void;
+  onFullscreen?: (() => void) | undefined;
   preferences: TerminalPreferenceValues;
   onPreferencesChange: (change: Partial<TerminalPreferenceValues>) => void;
   onRestoreDefaults: () => void;
@@ -20,6 +22,8 @@ export function Toolbar({ view, onSelectExample, onConnectDevice, preferences, o
   const [darkMode, setDarkMode] = useState(() => document.documentElement.dataset.theme === 'dark');
   const languageLabel = t('toolbar.language');
   const colorModeLabel = t(darkMode ? 'toolbar.switchToLight' : 'toolbar.switchToDark');
+  const githubLabel = t('toolbar.github');
+  const fullscreenLabel = t('toolbar.fullscreen');
 
   function toggleColorMode() {
     const mode = darkMode ? 'light' : 'dark';
@@ -50,23 +54,26 @@ export function Toolbar({ view, onSelectExample, onConnectDevice, preferences, o
         </SegmentedControl.Item>
       </SegmentedControl>
       <div className={styles.actions}>
-        <Button
-          type="button"
-          size="small"
-          variant="outline"
-          iconOnly
-          aria-label={colorModeLabel}
-          title={colorModeLabel}
-          onClick={toggleColorMode}
-        >
-          {darkMode ? <SunFilledIcon aria-hidden="true" /> : <MoonFilledIcon aria-hidden="true" />}
-        </Button>
+        <ToolbarTooltip label={githubLabel}>
+          <Button
+            type="button"
+            size="small"
+            variant="outline"
+            iconOnly
+            aria-label={githubLabel}
+            onClick={() => window.open('https://github.com/virgo-galaxy/virgo-terminal', '_blank', 'noopener,noreferrer')}
+          >
+            <GithubIcon aria-hidden="true" />
+          </Button>
+        </ToolbarTooltip>
         <Menu size="small">
-          <Menu.Trigger render={(props) => (
-            <Button {...props} size="small" variant="outline" iconOnly aria-label={languageLabel} title={languageLabel}>
-              <LanguageIcon aria-hidden="true" />
-            </Button>
-          )} />
+          <ToolbarTooltip label={languageLabel}>
+            <Menu.Trigger render={(props) => (
+              <Button {...props} size="small" variant="outline" iconOnly aria-label={languageLabel}>
+                <LanguageIcon aria-hidden="true" />
+              </Button>
+            )} />
+          </ToolbarTooltip>
           <Menu.Content placement="bottomEnd">
             <Menu.RadioGroup
               aria-label={languageLabel}
@@ -78,22 +85,24 @@ export function Toolbar({ view, onSelectExample, onConnectDevice, preferences, o
             </Menu.RadioGroup>
           </Menu.Content>
         </Menu>
-        <Button
-          type="button"
-          size="small"
-          variant="outline"
-          iconOnly
-          aria-label={t('toolbar.github')}
-          title="GitHub"
-          onClick={() => window.open('https://github.com/virgo-galaxy/virgo-terminal', '_blank', 'noopener,noreferrer')}
-        >
-          <GithubIcon aria-hidden="true" />
-        </Button>
+        <ToolbarTooltip label={colorModeLabel}>
+          <Button type="button" size="small" variant="outline" iconOnly aria-label={colorModeLabel} onClick={toggleColorMode}>
+            {darkMode ? <SunFilledIcon aria-hidden="true" /> : <MoonFilledIcon aria-hidden="true" />}
+          </Button>
+        </ToolbarTooltip>
         <TerminalPreferences
+          showShellSelection={showLocalShellDemo && view === 'shell'}
           preferences={preferences}
           onChange={onPreferencesChange}
           onRestoreDefaults={onRestoreDefaults}
         />
+        {onFullscreen && (
+          <ToolbarTooltip label={fullscreenLabel}>
+            <Button type="button" size="small" variant="outline" iconOnly aria-label={fullscreenLabel} onClick={onFullscreen}>
+              <MaximizeIcon aria-hidden="true" />
+            </Button>
+          </ToolbarTooltip>
+        )}
       </div>
     </div>
   );

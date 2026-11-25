@@ -1,13 +1,16 @@
 .root {
+  position: relative;
   block-size: 100%;
   overflow: auto;
 }
 
+:fullscreen:has(> .root:not([hidden]) > .waiting) {
+  --connect-device-status-color: light-dark(var(--vd-text-primary), var(--vd-text-secondary));
+  background-color: light-dark(#c0c0c0, var(--vd-surface-background));
+}
+
 .setup {
-  box-sizing: border-box;
-  max-inline-size: 48rem;
-  margin-inline: auto;
-  padding: clamp(var(--vd-spacing-24), 7vh, var(--vd-spacing-64)) var(--vd-spacing-16);
+  padding-block-start: clamp(var(--vd-spacing-24), 5vh, var(--vd-spacing-48));
 }
 
 .setup h1 {
@@ -26,7 +29,7 @@
 }
 
 .downloads {
-  margin: var(--vd-spacing-24) 0 var(--vd-spacing-12);
+  margin: var(--vd-spacing-24) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -58,6 +61,8 @@
 .macHelp {
   flex-basis: 100%;
   min-inline-size: 0;
+  padding-block-end: var(--vd-spacing-12);
+  border-block-end: 1px solid var(--vd-border-default);
   color: var(--vd-text-secondary);
   font-size: var(--vd-font-size-13);
 }
@@ -95,6 +100,52 @@
   display: flex;
   flex-direction: column;
   block-size: 100%;
+}
+
+.session[data-starting] {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+.waiting {
+  margin: 0;
+  padding: var(--vd-spacing-16);
+  color: var(--connect-device-status-color, var(--vd-text-secondary));
+  line-height: 1.6;
+}
+
+.waitingAnnouncement {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.waitingMessage {
+  color: var(--connect-device-status-color, var(--vd-text-primary));
+}
+
+.waitingMessage > span {
+  --waiting-dim-opacity: 0.74;
+  animation: waiting-brightness 2.8s ease-in-out infinite both;
+}
+
+.waitingMessage > span:nth-last-child(-n + 3) {
+  --waiting-dim-opacity: 0;
+}
+
+@keyframes waiting-brightness {
+  0%, 58%, 100% { opacity: var(--waiting-dim-opacity); }
+  7%, 46% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waitingMessage > span {
+    animation: none;
+  }
 }
 
 .terminal {
