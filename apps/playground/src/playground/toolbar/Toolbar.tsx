@@ -46,12 +46,13 @@ export function Toolbar({ view, onSelectExample, onConnectDevice, onFullscreen, 
       >
         <SegmentedControl.Item value="terminal" icon={<CodeIcon />}>{t('toolbar.terminal')}</SegmentedControl.Item>
         <SegmentedControl.Item value="logs" icon={<FileTextIcon />}>{t('toolbar.logs')}</SegmentedControl.Item>
-        {showLocalShellDemo && (
+        {showLocalShellDemo ? (
           <SegmentedControl.Item value="shell" icon={<MonitorIcon />}>{t('toolbar.shell')}</SegmentedControl.Item>
+        ) : (
+          <SegmentedControl.Item value="connect-device" icon={<MonitorPlugIcon />} onClick={onConnectDevice}>
+            {t('toolbar.connectDevice')}
+          </SegmentedControl.Item>
         )}
-        <SegmentedControl.Item value="connect-device" icon={<MonitorPlugIcon />} onClick={onConnectDevice}>
-          {t('toolbar.connectDevice')}
-        </SegmentedControl.Item>
       </SegmentedControl>
       <div className={styles.actions}>
         <ToolbarTooltip label={githubLabel}>
