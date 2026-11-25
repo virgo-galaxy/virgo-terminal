@@ -5,8 +5,9 @@ import '@virgo-nsh/highlighter/theme.css';
 
 // Match the model hashes pinned by @virgo-nsh/highlighter 0.1.1.
 const modelRelease = '7109bac49340b94ad5350778e32ee0d4196c5698';
+const guideLanguages = ['tsx', 'css', 'bash'];
 const highlighter = createHighlighter({
-  languages: ['tsx', 'css'],
+  languages: guideLanguages,
   resolveAssetUrl: ({ modelId, kind }) => {
     const extension = kind === 'model' ? 'onnx' : 'json';
     return `https://raw.githubusercontent.com/virgo-galaxy/virgo-nsh/${modelRelease}/packs/${modelId}/browser/model.${extension}`;
@@ -22,11 +23,11 @@ export function GuideCodeBlock({ node, children, ...props }: PreProps & ExtraPro
   const code = element.children[0];
   const classes = element.properties.className;
   const fence = Array.isArray(classes) ? classes[0] : classes;
-  if (code?.type !== 'text' || element.children.length !== 1 || (fence !== 'language-tsx' && fence !== 'language-css')) {
+  const language = guideLanguages.find((candidate) => fence === `language-${candidate}`);
+  if (!language || code?.type !== 'text' || element.children.length !== 1) {
     return <pre {...props}>{children}</pre>;
   }
 
-  const language = fence.slice('language-'.length);
   return <HighlightedBlock key={`${language}:${code.value}`} code={code.value} language={language} {...props} />;
 }
 

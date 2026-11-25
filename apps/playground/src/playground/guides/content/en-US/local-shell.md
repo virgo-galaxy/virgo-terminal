@@ -6,7 +6,7 @@ Run commands in your computer’s shell from the Playground. The terminal opens 
 
 Run these commands from the repository root.
 
-```sh
+```bash
 pnpm install
 pnpm dev
 ```

@@ -6,7 +6,7 @@
 
 在仓库根目录运行以下命令。
 
-```sh
+```bash
 pnpm install
 pnpm dev
 ```
