@@ -23,7 +23,7 @@ export function Toolbar({ view, onSelectExample, children }: {
   }
 
   return (
-    <header className="toolbar">
+    <div className="toolbar">
       <img src={terminalLogo} alt="Virgo Terminal" width={24} height={24} />
       <SegmentedControl
         aria-label={t('toolbar.examples')}
@@ -82,6 +82,6 @@ export function Toolbar({ view, onSelectExample, children }: {
         </Button>
         {children}
       </div>
-    </header>
+    </div>
   );
 }

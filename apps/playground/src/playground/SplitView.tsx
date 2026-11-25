@@ -1,5 +1,4 @@
 import { useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode, type RefObject } from 'react';
-import type { ExampleView } from '@/examples/types';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 
 const minGuideWidth = 360;
@@ -8,9 +7,8 @@ const minTerminalWidth = 320;
 const minTerminalRatio = 0.31;
 const resizeStep = 24;
 
-export function PlaygroundLayout({ view, layoutRef, terminal, guide }: {
-  view: ExampleView;
-  layoutRef: RefObject<HTMLElement | null>;
+export function SplitView({ containerRef, terminal, guide }: {
+  containerRef: RefObject<HTMLDivElement | null>;
   terminal: ReactNode;
   guide: ReactNode;
 }) {
@@ -18,7 +16,7 @@ export function PlaygroundLayout({ view, layoutRef, terminal, guide }: {
   const [guideRatio, setGuideRatio] = useState(0.5);
 
   function resizeGuide(divider: HTMLDivElement, width: number) {
-    const layout = layoutRef.current;
+    const layout = containerRef.current;
     if (!layout) return;
 
     const available = layout.clientWidth - divider.offsetWidth;
@@ -30,7 +28,7 @@ export function PlaygroundLayout({ view, layoutRef, terminal, guide }: {
 
   function moveDivider(event: PointerEvent<HTMLDivElement>) {
     const divider = event.currentTarget;
-    const layout = layoutRef.current;
+    const layout = containerRef.current;
     if (!layout || !divider.hasPointerCapture(event.pointerId)) return;
 
     resizeGuide(divider, event.clientX - layout.getBoundingClientRect().left - divider.offsetWidth / 2);
@@ -38,7 +36,7 @@ export function PlaygroundLayout({ view, layoutRef, terminal, guide }: {
 
   function resizeWithKeyboard(event: KeyboardEvent<HTMLDivElement>) {
     const divider = event.currentTarget;
-    const layout = layoutRef.current;
+    const layout = containerRef.current;
     if (!layout) return;
 
     const currentWidth = divider.getBoundingClientRect().left - layout.getBoundingClientRect().left;
@@ -56,10 +54,10 @@ export function PlaygroundLayout({ view, layoutRef, terminal, guide }: {
   }
 
   return (
-    <main
-      className="playground-layout"
-      data-view={view}
-      ref={layoutRef}
+    <div
+      className="split-view"
+      data-single-pane={!guide || undefined}
+      ref={containerRef}
       style={{
         '--guide-min-width': `${minGuideWidth}px`,
         '--guide-min-ratio': minGuideRatio,
@@ -90,6 +88,6 @@ export function PlaygroundLayout({ view, layoutRef, terminal, guide }: {
           {guide}
         </>
       )}
-    </main>
+    </div>
   );
 }

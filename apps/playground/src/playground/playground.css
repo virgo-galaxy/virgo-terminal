@@ -1,0 +1,167 @@
+.playground {
+  block-size: 100%;
+  gap: var(--vd-spacing-12);
+}
+
+.playground-content {
+  display: flex;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--vd-spacing-8);
+  min-inline-size: 0;
+  inline-size: 100%;
+}
+
+.toolbar-examples {
+  max-inline-size: 100%;
+}
+
+@media (max-width: 360px) {
+  .toolbar .toolbar-examples {
+    --vd-control-small-padding-inline: var(--vd-spacing-4);
+    --segmented-icon-size: var(--vd-sizing-12);
+    --segmented-gap: var(--vd-spacing-2);
+  }
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--vd-spacing-8);
+  margin-inline-start: auto;
+}
+
+.split-view {
+  --pane-divider-width: var(--vd-spacing-12);
+  --pane-available-width: calc(100% - var(--pane-divider-width));
+  --terminal-minimum: max(var(--terminal-min-width), calc(var(--pane-available-width) * var(--terminal-min-ratio)));
+  --guide-width: clamp(
+    max(var(--guide-min-width), calc(var(--pane-available-width) * var(--guide-min-ratio))),
+    calc(var(--pane-available-width) * var(--guide-ratio)),
+    calc(var(--pane-available-width) - var(--terminal-minimum))
+  );
+  display: grid;
+  flex: 1;
+  grid-template: "guide divider terminal" minmax(0, 1fr) / var(--guide-width) var(--pane-divider-width) minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+.split-view[data-single-pane] {
+  grid-template: "terminal" minmax(0, 1fr) / minmax(0, 1fr);
+}
+
+.guide-frame,
+.terminal-frame {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--vd-border-default);
+  border-radius: var(--vd-shape-radius-6);
+}
+
+.guide-frame {
+  grid-area: guide;
+  overflow: auto;
+  scrollbar-color: var(--vd-border-default) transparent;
+}
+
+.guide-loading {
+  margin: var(--vd-spacing-16);
+  color: var(--vd-text-secondary);
+}
+
+.pane-divider {
+  grid-area: divider;
+  display: grid;
+  place-items: center;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.pane-divider::before {
+  inline-size: var(--vd-spacing-2);
+  block-size: var(--vd-sizing-40);
+  border-radius: var(--vd-shape-radius-4);
+  background: var(--vd-border-default);
+  content: '';
+}
+
+.pane-divider:is(:hover, :active, :focus-visible)::before {
+  background: var(--vd-border-focus);
+}
+
+.pane-divider:focus-visible {
+  outline: 1px solid var(--vd-border-focus);
+  outline-offset: -1px;
+}
+
+.terminal-frame {
+  grid-area: terminal;
+  overflow: hidden;
+  padding: var(--vd-spacing-8);
+}
+
+@media (max-width: 900px) {
+  .split-view:not([data-single-pane]) {
+    grid-template: "terminal" clamp(16rem, 43dvh, 24rem) "guide" auto / minmax(0, 1fr);
+    align-content: start;
+    gap: var(--vd-spacing-12);
+    overflow: auto;
+  }
+
+  .guide-frame {
+    overflow: visible;
+  }
+
+  .pane-divider {
+    display: none;
+  }
+}
+
+.demo-terminal {
+  height: 100%;
+}
+
+.simulated-logs {
+  position: relative;
+  height: 100%;
+}
+
+.simulated-logs > .demo-terminal {
+  isolation: isolate;
+}
+
+.logs-back-to-top {
+  position: absolute;
+  z-index: 1;
+  inset-inline-end: var(--vd-spacing-16);
+  inset-block-end: var(--vd-spacing-8);
+}
+
+.local-shell:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+
+.local-shell-terminal {
+  flex: 1;
+  min-block-size: 0;
+}
+
+.local-shell-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-block-start: var(--vd-spacing-8);
+}
+
+.start-shell-button {
+  --vd-brand-primary: var(--vd-status-success-solid);
+  --vd-brand-primary-hover: color-mix(in srgb, var(--vd-status-success-solid) 92%, var(--vd-status-success-foreground));
+  --vd-brand-primary-active: color-mix(in srgb, var(--vd-status-success-solid) 85%, var(--vd-status-success-foreground));
+  --vd-brand-foreground: var(--vd-status-success-on-solid);
+}

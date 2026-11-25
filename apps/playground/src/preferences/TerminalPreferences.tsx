@@ -6,6 +6,7 @@ import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import {
   defaultPreferences, fonts, historyLimits, scrollbarRadii, scrollbarWidths, sizes, themes, type TerminalPreferenceValues,
 } from './preferences';
+import './preferences.css';
 
 const themeOptions = Object.keys(themes) as Array<keyof typeof themes>;
 
