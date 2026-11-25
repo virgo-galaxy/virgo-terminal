@@ -54,7 +54,7 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
           onRestoreDefaults={() => setPreferences({ ...defaultPreferences, font: initialFont })}
         />
       )}
-      guide={view !== 'shell' && <Guide view={view} locale={locale} />}
+      guide={<Guide view={view} locale={locale} />}
       guideKey={view}
       terminalStyle={{ backgroundColor: appearance.theme.background }}
       terminal={(
