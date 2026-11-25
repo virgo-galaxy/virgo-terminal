@@ -9,11 +9,20 @@ import type { DeviceTicket } from './deviceTicket';
 import { useDeviceConnection } from './useDeviceConnection';
 import styles from './connect-device.module.css';
 
-const downloads = [
-  { label: 'connectDevice.macos', filename: 'virgo-terminal-macos-universal.zip', icon: AppleIcon },
-  { label: 'connectDevice.windows', filename: 'virgo-terminal-windows-x64.exe', icon: WindowsIcon },
-] as const;
+const downloads = {
+  macos: { label: 'connectDevice.macos', filename: 'virgo-terminal-macos-universal.zip', icon: AppleIcon },
+  windows: { label: 'connectDevice.windows', filename: 'virgo-terminal-windows-x64.exe', icon: WindowsIcon },
+} as const;
 const macOpenCommand = 'xattr -dr com.apple.quarantine "$HOME/Downloads/Virgo Terminal Client.app" && open "$HOME/Downloads/Virgo Terminal Client.app"';
+
+function getClientPlatform(): keyof typeof downloads | null {
+  const { userAgent, maxTouchPoints } = navigator;
+  if (/Android|iPhone|iPad|iPod|Windows Phone/i.test(userAgent)) return null;
+  if (/Windows NT/i.test(userAgent)) return 'windows';
+  // iPadOS can send a desktop Mac user agent.
+  if (/Macintosh/i.test(userAgent) && maxTouchPoints < 2) return 'macos';
+  return null;
+}
 
 export function ConnectDevice({ options, ticket, visible }: {
   options: DemoTerminalProps;
@@ -23,17 +32,21 @@ export function ConnectDevice({ options, ticket, visible }: {
   const { locale, t } = usePlaygroundLocale();
   const terminal = useRef<TerminalHandle>(null);
   const { status, connect, start, sendInput, sendSize } = useDeviceConnection(ticket, terminal);
-  const [downloading, setDownloading] = useState<string | null>(null);
+  const [platform] = useState(getClientPlatform);
+  const download = platform ? downloads[platform] : null;
+  const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<'unavailable' | 'failed' | null>(null);
   const needsSetup = status === 'idle' || status === 'failed' || status === 'denied';
   const hasLaunchTicket = status === 'idle' && ticket !== null;
+  const canConnect = hasLaunchTicket || download !== null;
+  const instructions = download ? 'connectDevice.instructions' : 'connectDevice.unsupportedPlatform';
 
   useEffect(() => {
     if (visible && status === 'connected') terminal.current?.focus();
   }, [visible, status]);
 
   async function downloadClient(filename: string) {
-    setDownloading(filename);
+    setDownloading(true);
     setDownloadError(null);
     try {
       const href = await getLatestClientDownload(filename);
@@ -45,7 +58,7 @@ export function ConnectDevice({ options, ticket, visible }: {
     } catch {
       setDownloadError('failed');
     } finally {
-      setDownloading(null);
+      setDownloading(false);
     }
   }
 
@@ -54,47 +67,47 @@ export function ConnectDevice({ options, ticket, visible }: {
       {needsSetup ? (
         <div className={styles.setup}>
           <h1>{t('toolbar.connectDevice')}</h1>
-          <p>{t(hasLaunchTicket ? 'connectDevice.authorize' : 'connectDevice.instructions')}</p>
-          <Button type="button" leadingIcon={<MonitorIcon aria-hidden="true" />} onClick={connect}>
-            {t('connectDevice.connect')}
-          </Button>
+          <p>{t(hasLaunchTicket ? 'connectDevice.authorize' : instructions)}</p>
+          {canConnect && (
+            <Button type="button" leadingIcon={<MonitorIcon aria-hidden="true" />} onClick={connect}>
+              {t('connectDevice.connect')}
+            </Button>
+          )}
           {status !== 'idle' && <p className={styles.availability} role="status">{t(`connectDevice.${status}`)}</p>}
-          {!hasLaunchTicket && (
+          {!hasLaunchTicket && download && (
             <>
               <ul className={styles.downloads}>
-                {downloads.map(({ label, filename, icon: PlatformIcon }) => (
-                  <li key={filename}>
-                    <span className={styles.platform}>
-                      <PlatformIcon className={styles.platformIcon} aria-hidden="true" />
-                      {t(label)}
-                    </span>
-                    <Button
-                      type="button"
-                      disabled={downloading !== null}
-                      aria-busy={downloading === filename}
-                      onClick={() => void downloadClient(filename)}
-                      aria-label={`${t('connectDevice.download')} ${t(label)}`}
-                      leadingIcon={<DownloadIcon aria-hidden="true" />}
-                      size="small"
-                      variant="outline"
-                    >
-                      {t(downloading === filename ? 'connectDevice.checkingRelease' : 'connectDevice.download')}
-                    </Button>
-                    {label === 'connectDevice.macos' && (
-                      <details className={styles.macHelp}>
-                        <summary>{t('connectDevice.macOpenHelp')}</summary>
-                        <p>
-                          {t('connectDevice.macOpenSettings')}{' '}
-                          <a href={`https://support.apple.com/${locale.toLowerCase()}/102445`} target="_blank" rel="noreferrer">
-                            {t('connectDevice.macOpenAppleSupport')}
-                          </a>
-                        </p>
-                        <p>{t('connectDevice.macOpenCommand')}</p>
-                        <pre><code>{macOpenCommand}</code></pre>
-                      </details>
-                    )}
-                  </li>
-                ))}
+                <li>
+                  <span className={styles.platform}>
+                    <download.icon className={styles.platformIcon} aria-hidden="true" />
+                    {t(download.label)}
+                  </span>
+                  <Button
+                    type="button"
+                    disabled={downloading}
+                    aria-busy={downloading}
+                    onClick={() => void downloadClient(download.filename)}
+                    aria-label={`${t('connectDevice.download')} ${t(download.label)}`}
+                    leadingIcon={<DownloadIcon aria-hidden="true" />}
+                    size="small"
+                    variant="outline"
+                  >
+                    {t(downloading ? 'connectDevice.checkingRelease' : 'connectDevice.download')}
+                  </Button>
+                  {platform === 'macos' && (
+                    <details className={styles.macHelp}>
+                      <summary>{t('connectDevice.macOpenHelp')}</summary>
+                      <p>
+                        {t('connectDevice.macOpenSettings')}{' '}
+                        <a href={`https://support.apple.com/${locale.toLowerCase()}/102445`} target="_blank" rel="noreferrer">
+                          {t('connectDevice.macOpenAppleSupport')}
+                        </a>
+                      </p>
+                      <p>{t('connectDevice.macOpenCommand')}</p>
+                      <pre><code>{macOpenCommand}</code></pre>
+                    </details>
+                  )}
+                </li>
               </ul>
               {downloadError && (
                 <p className={styles.availability} role="status">

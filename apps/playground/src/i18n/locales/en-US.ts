@@ -38,6 +38,7 @@ export const enUS = {
   'logs.backToTop': 'Back to top',
   'shell.start': 'Start shell',
   'connectDevice.instructions': 'Open the Virgo Terminal client, then click Connect here. If the browser asks for access to this computer, choose Allow.',
+  'connectDevice.unsupportedPlatform': 'This operating system is not supported.',
   'connectDevice.macos': 'macOS Universal',
   'connectDevice.macOpenHelp': 'Can’t open the app?',
   'connectDevice.macOpenSettings': 'If macOS blocks the app you downloaded here, click Done, then go to System Settings → Privacy & Security → Open Anyway.',

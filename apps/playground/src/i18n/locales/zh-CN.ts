@@ -40,6 +40,7 @@ export const zhCN: Record<MessageKey, string> = {
   'logs.backToTop': '返回顶部',
   'shell.start': '启动 Shell',
   'connectDevice.instructions': '打开 Virgo Terminal 客户端，然后在这里点击「连接」。如果浏览器询问是否允许访问本机，请选择允许。',
+  'connectDevice.unsupportedPlatform': '当前操作系统不支持。',
   'connectDevice.macos': 'macOS 通用版',
   'connectDevice.macOpenHelp': '打不开？',
   'connectDevice.macOpenSettings': '如果 macOS 拦截了从这里下载的 App，先点「完成」，再到「系统设置 → 隐私与安全性 → 仍要打开」。',
