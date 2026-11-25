@@ -1,15 +1,19 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { CodeIcon, FileTextIcon, GithubIcon, LanguageIcon, MonitorIcon, MoonFilledIcon, SunFilledIcon } from '@virgo-design/icons';
 import { Button, Menu, SegmentedControl } from '@virgo-design/ui';
 import terminalLogo from '@/assets/virgo-terminal-logo.svg';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
-import type { ExampleView } from './examples/types';
-import styles from './header.module.css';
+import type { ExampleView } from '../terminal/types';
+import type { TerminalPreferenceValues } from './preferences/preferences';
+import { TerminalPreferences } from './preferences/TerminalPreferences';
+import styles from './toolbar.module.css';
 
-export function Header({ view, onSelectExample, children }: {
+export function Toolbar({ view, onSelectExample, preferences, onPreferencesChange, onRestoreDefaults }: {
   view: ExampleView;
   onSelectExample: (view: ExampleView) => void;
-  children: ReactNode;
+  preferences: TerminalPreferenceValues;
+  onPreferencesChange: (change: Partial<TerminalPreferenceValues>) => void;
+  onRestoreDefaults: () => void;
 }) {
   const { locale, setLocale, t } = usePlaygroundLocale();
   const [darkMode, setDarkMode] = useState(() => document.documentElement.dataset.theme === 'dark');
@@ -24,7 +28,7 @@ export function Header({ view, onSelectExample, children }: {
   }
 
   return (
-    <div className={styles.header}>
+    <div className={styles.toolbar}>
       <img src={terminalLogo} alt="Virgo Terminal" width={24} height={24} />
       <SegmentedControl
         aria-label={t('toolbar.examples')}
@@ -81,7 +85,11 @@ export function Header({ view, onSelectExample, children }: {
         >
           <GithubIcon aria-hidden="true" />
         </Button>
-        {children}
+        <TerminalPreferences
+          preferences={preferences}
+          onChange={onPreferencesChange}
+          onRestoreDefaults={onRestoreDefaults}
+        />
       </div>
     </div>
   );

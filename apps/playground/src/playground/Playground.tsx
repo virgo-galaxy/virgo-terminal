@@ -1,12 +1,10 @@
 import { lazy, useRef, useState } from 'react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import { Layout } from '@/layout/Layout';
-import { useShellOptions } from './examples/local-shell/useShellOptions';
-import type { DemoTerminalProps, ExampleView } from './examples/types';
-import { Header } from './Header';
-import { defaultPreferences, fonts, themes, type TerminalPreferenceValues } from './preferences/preferences';
-import { TerminalPreferences } from './preferences/TerminalPreferences';
-import { Terminal, type ShellSession } from './Terminal';
+import { Terminal, type ShellSession } from './terminal/Terminal';
+import type { DemoTerminalProps, ExampleView } from './terminal/types';
+import { defaultPreferences, fonts, themes, type TerminalPreferenceValues } from './toolbar/preferences/preferences';
+import { Toolbar } from './toolbar/Toolbar';
 
 const Guide = lazy(() => import('./guides/Guide'));
 
@@ -18,7 +16,6 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
   const [preferences, setPreferences] = useState<TerminalPreferenceValues>(
     () => ({ ...defaultPreferences, font: initialFont }),
   );
-  const shellOptions = useShellOptions(defaultPreferences.shellId);
   const appearance = {
     fontFamily: fonts[preferences.font].family,
     fontSize: Number(preferences.fontSize),
@@ -49,14 +46,13 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
     <Layout
       containerRef={content}
       header={(
-        <Header view={view} onSelectExample={selectExample}>
-          <TerminalPreferences
-            preferences={preferences}
-            shellOptions={shellOptions}
-            onChange={(change) => setPreferences((current) => ({ ...current, ...change }))}
-            onRestoreDefaults={() => setPreferences({ ...defaultPreferences, font: initialFont })}
-          />
-        </Header>
+        <Toolbar
+          view={view}
+          onSelectExample={selectExample}
+          preferences={preferences}
+          onPreferencesChange={(change) => setPreferences((current) => ({ ...current, ...change }))}
+          onRestoreDefaults={() => setPreferences({ ...defaultPreferences, font: initialFont })}
+        />
       )}
       guide={view !== 'shell' && <Guide view={view} locale={locale} />}
       guideKey={view}

@@ -1,4 +1,4 @@
-.header {
+.toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -12,7 +12,7 @@
 }
 
 @media (max-width: 360px) {
-  .header .examples {
+  .toolbar .examples {
     --vd-control-small-padding-inline: var(--vd-spacing-4);
     --segmented-icon-size: var(--vd-sizing-12);
     --segmented-gap: var(--vd-spacing-2);

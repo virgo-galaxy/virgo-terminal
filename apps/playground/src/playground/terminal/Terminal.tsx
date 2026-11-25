@@ -1,7 +1,7 @@
-import { InteractiveTerminal } from './examples/interactive-terminal/InteractiveTerminal';
-import { LocalShell } from './examples/local-shell/LocalShell';
-import { SimulatedLogs } from './examples/simulated-logs/SimulatedLogs';
-import type { DemoTerminalProps, ExampleView } from './examples/types';
+import { InteractiveTerminal } from './samples/interactive-terminal/InteractiveTerminal';
+import { LocalShell } from './samples/local-shell/LocalShell';
+import { SimulatedLogs } from './samples/simulated-logs/SimulatedLogs';
+import type { DemoTerminalProps, ExampleView } from './types';
 
 export type ShellSession = { attempt: number; shellId: string };
 

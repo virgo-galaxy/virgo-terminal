@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { enUS as enUSUi, LocaleProvider, zhCN as zhCNUi } from '@virgo-design/ui/locale';
-import { enUS, type MessageKey } from './en-US';
-import { zhCN } from './zh-CN';
+import { enUS, type MessageKey } from './locales/en-US';
+import { zhCN } from './locales/zh-CN';
 
 const messages = { 'en-US': enUS, 'zh-CN': zhCN };
 export type PlaygroundLocale = keyof typeof messages;

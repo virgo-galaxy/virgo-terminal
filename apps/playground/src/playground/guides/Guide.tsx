@@ -1,10 +1,10 @@
 import Markdown, { type Components } from 'react-markdown';
 import type { PlaygroundLocale } from '@/i18n/PlaygroundLocale';
-import type { ExampleView } from '../examples/types';
-import enLogs from './en-US/simulated-logs.md?raw';
-import enTerminal from './en-US/terminal.md?raw';
-import zhLogs from './zh-CN/simulated-logs.md?raw';
-import zhTerminal from './zh-CN/terminal.md?raw';
+import type { ExampleView } from '../terminal/types';
+import enLogs from './content/en-US/simulated-logs.md?raw';
+import enTerminal from './content/en-US/terminal.md?raw';
+import zhLogs from './content/zh-CN/simulated-logs.md?raw';
+import zhTerminal from './content/zh-CN/terminal.md?raw';
 import { GuideCodeBlock } from './GuideCodeBlock';
 import styles from './guide.module.css';
 

@@ -1,4 +1,4 @@
-import { failedRequests, successfulRequests, type LogRequest } from '../fixtures';
+import { failedRequests, successfulRequests, type LogRequest } from './fixtures';
 
 export function formatLogLine(sequence: number, time = new Date()) {
   const failed = sequence % 9 === 0;

@@ -3,9 +3,9 @@ import { ArrowUpIcon } from '@virgo-design/icons';
 import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
-import styles from '../examples.module.css';
-import type { DemoTerminalProps } from '../types';
-import { formatLogLine } from './lib/formatLogLine';
+import styles from '../../terminal.module.css';
+import type { DemoTerminalProps } from '../../types';
+import { formatLogLine } from './formatLogLine';
 
 const initialLogCount = 80;
 const logIntervalMs = 500;
