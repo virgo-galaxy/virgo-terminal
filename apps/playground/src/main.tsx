@@ -9,7 +9,7 @@ import '@virgo-design/tokens/styles.css';
 import '@virgo-design/themes/virgo.css';
 import '@virgo-design/ui/styles.css';
 import '@virgo-terminal/react/styles.css';
-import '@/app/app.css';
+import './style.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Playground root element is missing.');
