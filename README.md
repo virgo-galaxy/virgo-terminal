@@ -6,6 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/virgo-galaxy/virgo-terminal/actions/workflows/ci.yml"><img src="https://github.com/virgo-galaxy/virgo-terminal/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status" /></a>
+  <a href="https://www.npmjs.com/package/@virgo-terminal/react"><img src="https://img.shields.io/npm/v/@virgo-terminal/react?logo=npm&amp;label=npm" alt="npm version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license" /></a>
   <a href=".node-version"><img src="https://img.shields.io/badge/node.js-24.x-339933?logo=nodedotjs&amp;logoColor=white" alt="Node.js 24.x" /></a>
   <a href="package.json"><img src="https://img.shields.io/badge/pnpm-11.9.0-F69220?logo=pnpm&amp;logoColor=white" alt="pnpm 11.9.0" /></a>
@@ -15,30 +16,15 @@
   English | <a href="README.zh-CN.md">简体中文</a>
 </p>
 
-Virgo Terminal is a React terminal component built on [xterm.js](https://xtermjs.org/). Use it to display ANSI output, stream read-only logs, or connect terminal input and output to a shell provided by your application.
+<p align="center">
+  <a href="https://terminal.virgogalaxy.com/">Try the Playground</a>
+</p>
 
-## Run the Playground
-
-From the repository root, use Node.js 24 and pnpm 11.9.0.
-
-```sh
-pnpm install --frozen-lockfile
-pnpm dev
-```
-
-Open [localhost:3000](http://127.0.0.1:3000/). **Terminal** and **Simulated logs** pair live demos with integration guides in English and Simplified Chinese.
-
-| Example | What it demonstrates |
-| --- | --- |
-| Terminal | Keyboard input and echo in an interactive terminal. |
-| Simulated logs | Streaming colored ANSI output in a read-only terminal. |
-| Local Shell | A real shell on the machine running the Vite dev server, connected over a local WebSocket. |
-
-Local Shell is available in local development. It starts with the system default shell, and the settings drawer lists supported alternatives found on the machine, such as Zsh, Bash, CMD, and PowerShell.
+Virgo Terminal is a React component for interactive terminals and streaming logs. It displays ANSI output and lets your application connect terminal input and output to a shell over its own transport. The component is built on [xterm.js](https://xtermjs.org/).
 
 ## Use the React component
 
-Install `@virgo-terminal/react` in your React app.
+Install `@virgo-terminal/react` in an app using React 18.2 or later in the 18.x series, or React 19.
 
 ```sh
 npm install @virgo-terminal/react
@@ -60,7 +46,7 @@ export function TerminalExample() {
       className="terminal-example"
       autoFit
       onReady={(instance) => instance.write('Hello, Virgo Terminal!\r\n')}
-      onData={(data) => terminal.current?.write(data.replace(/\r/g, '\r\n'))}
+      onData={(data) => terminal.current?.write(data.replace(/\r\n|\r|\n/g, '\r\n'))}
     />
   );
 }
@@ -72,16 +58,41 @@ export function TerminalExample() {
 }
 ```
 
-For logs, set `readOnly` and call `terminal.current?.write(...)` as data arrives. For a shell, send `onData` to your transport and use `onResize` to forward the terminal dimensions.
+### Common integrations
+
+| Task | API |
+| --- | --- |
+| Stream read-only logs | Set `readOnly` and call `write()` as lines arrive. Set `scrollback` to cap the retained history. |
+| Connect a shell | Send keyboard input from `onData` and terminal dimensions from `onResize` to your transport. Pass the shell's output to `write()`. |
+| Customize appearance and input | Use `appearance` for font and colors, `scrollbar` for the scrollbar, and `copyOnSelect` or `shouldHandleKeyEvent` for input behavior. |
+
+## Playground
+
+**Terminal** and **Simulated logs** pair live demos with integration guides in English and Simplified Chinese.
+
+| Example | What you can try |
+| --- | --- |
+| Terminal | Type into an interactive terminal and see the input echoed back. |
+| Simulated logs | Watch timestamped, ANSI-colored logs stream into a read-only terminal. |
+| Connect device | Use the hosted Playground with a shell on your own Mac or Windows computer. Download the desktop client, choose a shell, and click **Connect** in the client. [Open Connect device](https://terminal.virgogalaxy.com/?view=connect-device) |
+| Local Shell | When running the Playground locally, open a shell through the Vite dev server. The settings drawer lists the default shell and supported alternatives installed on the machine. |
 
 ## Development
+
+From the repository root, use Node.js 24 and pnpm 11.9.0.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+Open [localhost:3000](http://127.0.0.1:3000/). Run `pnpm check` for type-checking, lint, tests, and builds.
 
 | Directory | Contents |
 | --- | --- |
 | [packages/react](packages/react) | React component, public TypeScript API, stylesheet, and tests. |
-| [apps/playground](apps/playground) | Vite demos, preferences, and the local shell adapter. |
-
-Run `pnpm check` to type-check, lint, run tests, and build the workspace.
+| [apps/playground](apps/playground) | Vite Playground, bilingual guides, and the development shell adapter. |
+| [apps/local-client](apps/local-client) | Go desktop client for Connect device on macOS and Windows. |
 
 ## Contributing
 

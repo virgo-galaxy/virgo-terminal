@@ -6,6 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/virgo-galaxy/virgo-terminal/actions/workflows/ci.yml"><img src="https://github.com/virgo-galaxy/virgo-terminal/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI 状态" /></a>
+  <a href="https://www.npmjs.com/package/@virgo-terminal/react"><img src="https://img.shields.io/npm/v/@virgo-terminal/react?logo=npm&amp;label=npm" alt="npm 版本" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT 许可证" /></a>
   <a href=".node-version"><img src="https://img.shields.io/badge/node.js-24.x-339933?logo=nodedotjs&amp;logoColor=white" alt="Node.js 24.x" /></a>
   <a href="package.json"><img src="https://img.shields.io/badge/pnpm-11.9.0-F69220?logo=pnpm&amp;logoColor=white" alt="pnpm 11.9.0" /></a>
@@ -15,30 +16,15 @@
   <a href="README.md">English</a> | 简体中文
 </p>
 
-Virgo Terminal 是基于 [xterm.js](https://xtermjs.org/) 的 React 终端组件。它可以显示 ANSI 输出、持续接收只读日志，也可以把终端的输入和输出接到应用提供的 Shell 上。
+<p align="center">
+  <a href="https://terminal.virgogalaxy.com/">体验 Playground</a>
+</p>
 
-## 运行 Playground
-
-在仓库根目录使用 Node.js 24 和 pnpm 11.9.0。
-
-```sh
-pnpm install --frozen-lockfile
-pnpm dev
-```
-
-打开 [localhost:3000](http://127.0.0.1:3000/)。**Terminal** 和 **Simulated logs** 都有实时演示和中英文接入指南。
-
-| 示例 | 内容 |
-| --- | --- |
-| Terminal | 交互终端里的键盘输入与回显。 |
-| Simulated logs | 在只读终端中持续输出带 ANSI 颜色的模拟日志。 |
-| Local Shell | 通过本地 WebSocket 连接到运行 Vite 开发服务的机器上的真实 Shell。 |
-
-Local Shell 在本地开发时可用。它默认使用系统 Shell，设置抽屉会列出在本机检测到的受支持选项，例如 Zsh、Bash、CMD 和 PowerShell。
+Virgo Terminal 是用于交互终端和流式日志的 React 组件，支持显示 ANSI 输出。应用可以通过自己的连接层对接 Shell，转发终端输入和输出。终端基于 [xterm.js](https://xtermjs.org/)。
 
 ## 使用 React 组件
 
-在 React 应用中安装 `@virgo-terminal/react`。
+在 React 18.2 及以上的 18.x 版本或 React 19 应用中安装 `@virgo-terminal/react`。
 
 ```sh
 npm install @virgo-terminal/react
@@ -60,7 +46,7 @@ export function TerminalExample() {
       className="terminal-example"
       autoFit
       onReady={(instance) => instance.write('Hello, Virgo Terminal!\r\n')}
-      onData={(data) => terminal.current?.write(data.replace(/\r/g, '\r\n'))}
+      onData={(data) => terminal.current?.write(data.replace(/\r\n|\r|\n/g, '\r\n'))}
     />
   );
 }
@@ -72,16 +58,41 @@ export function TerminalExample() {
 }
 ```
 
-显示日志时，设置 `readOnly`，收到数据后调用 `terminal.current?.write(...)`。接入 Shell 时，通过 `onData` 把输入交给连接层，再用 `onResize` 同步终端尺寸。
+### 常见接入方式
+
+| 用途 | API |
+| --- | --- |
+| 显示只读日志 | 设置 `readOnly`，新日志到达时调用 `write()`，用 `scrollback` 限制保留的历史行数。 |
+| 接入 Shell | 通过 `onData` 发送键盘输入，用 `onResize` 同步终端尺寸。收到 Shell 输出后调用 `write()`。 |
+| 调整外观和输入 | 用 `appearance` 设置字体和颜色，用 `scrollbar` 调整滚动条，用 `copyOnSelect` 和 `shouldHandleKeyEvent` 控制交互。 |
+
+## Playground
+
+**Terminal** 和 **Simulated logs** 都有实时演示和中英文接入指南。
+
+| 示例 | 可以体验什么 |
+| --- | --- |
+| Terminal | 在交互终端中输入并查看回显。 |
+| Simulated logs | 在只读终端里查看带时间戳和 ANSI 颜色的流式日志。 |
+| Connect device | 从线上 Playground 使用自己 Mac 或 Windows 电脑上的 Shell。下载客户端，选好 Shell 后在客户端点击「连接」。[打开连接本机](https://terminal.virgogalaxy.com/?view=connect-device) |
+| Local Shell | 本地运行 Playground 时，通过 Vite 开发服务打开 Shell。设置抽屉会显示系统默认 Shell 和本机已安装的受支持选项。 |
 
 ## 开发
+
+在仓库根目录使用 Node.js 24 和 pnpm 11.9.0。
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+打开 [localhost:3000](http://127.0.0.1:3000/)。运行 `pnpm check` 可以完成类型检查、Lint、测试和构建。
 
 | 目录 | 内容 |
 | --- | --- |
 | [packages/react](packages/react) | React 组件、公开的 TypeScript API、样式及测试。 |
-| [apps/playground](apps/playground) | Vite 示例、终端设置和本地 Shell 适配代码。 |
-
-运行 `pnpm check` 可执行类型检查、Lint、测试和构建。
+| [apps/playground](apps/playground) | Vite Playground、中英文接入指南和开发环境的 Shell 适配代码。 |
+| [apps/local-client](apps/local-client) | 用 Go 编写的 macOS 和 Windows 客户端，用于「连接本机」。 |
 
 ## 参与贡献
 
