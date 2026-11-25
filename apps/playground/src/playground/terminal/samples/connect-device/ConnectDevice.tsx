@@ -1,14 +1,14 @@
 import { AppleIcon, DownloadIcon, MonitorIcon, WindowsIcon } from '@virgo-design/icons';
 import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import type { DemoTerminalProps } from '../../types';
+import { getLatestClientDownload } from './clientRelease';
 import type { DeviceTicket } from './deviceTicket';
 import { useDeviceConnection } from './useDeviceConnection';
 import styles from './connect-device.module.css';
 
-const releaseTag = import.meta.env.VITE_LOCAL_CLIENT_RELEASE_TAG as string | undefined;
 const downloads = [
   { label: 'connectDevice.macos', filename: 'virgo-terminal-macos-universal.zip', icon: AppleIcon },
   { label: 'connectDevice.windows', filename: 'virgo-terminal-windows-x64.exe', icon: WindowsIcon },
@@ -22,10 +22,29 @@ export function ConnectDevice({ options, ticket, visible }: {
   const { t } = usePlaygroundLocale();
   const terminal = useRef<TerminalHandle>(null);
   const { status, connect, start, sendInput, sendSize } = useDeviceConnection(ticket, terminal);
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<'unavailable' | 'failed' | null>(null);
 
   useEffect(() => {
     if (visible && status === 'connected') terminal.current?.focus();
   }, [visible, status]);
+
+  async function downloadClient(filename: string) {
+    setDownloading(filename);
+    setDownloadError(null);
+    try {
+      const href = await getLatestClientDownload(filename);
+      if (href) {
+        window.location.assign(href);
+      } else {
+        setDownloadError('unavailable');
+      }
+    } catch {
+      setDownloadError('failed');
+    } finally {
+      setDownloading(null);
+    }
+  }
 
   return (
     <section className={styles.root} hidden={!visible} aria-label={t('toolbar.connectDevice')}>
@@ -43,34 +62,32 @@ export function ConnectDevice({ options, ticket, visible }: {
             <>
               <p>{t('connectDevice.instructions')}</p>
               <ul className={styles.downloads}>
-                {downloads.map(({ label, filename, icon: PlatformIcon }) => {
-                  const href = releaseTag
-                    ? `https://github.com/virgo-galaxy/virgo-terminal/releases/download/${encodeURIComponent(releaseTag)}/${filename}`
-                    : undefined;
-                  return (
-                    <li key={filename}>
-                      <span className={styles.platform}>
-                        <PlatformIcon className={styles.platformIcon} aria-hidden="true" />
-                        {t(label)}
-                      </span>
-                      <Button
-                        type="button"
-                        disabled={!href}
-                        onClick={() => {
-                          if (href) window.location.assign(href);
-                        }}
-                        aria-label={`${t('connectDevice.download')} ${t(label)}`}
-                        leadingIcon={<DownloadIcon aria-hidden="true" />}
-                        size="small"
-                        variant="outline"
-                      >
-                        {t('connectDevice.download')}
-                      </Button>
-                    </li>
-                  );
-                })}
+                {downloads.map(({ label, filename, icon: PlatformIcon }) => (
+                  <li key={filename}>
+                    <span className={styles.platform}>
+                      <PlatformIcon className={styles.platformIcon} aria-hidden="true" />
+                      {t(label)}
+                    </span>
+                    <Button
+                      type="button"
+                      disabled={downloading !== null}
+                      aria-busy={downloading === filename}
+                      onClick={() => void downloadClient(filename)}
+                      aria-label={`${t('connectDevice.download')} ${t(label)}`}
+                      leadingIcon={<DownloadIcon aria-hidden="true" />}
+                      size="small"
+                      variant="outline"
+                    >
+                      {t(downloading === filename ? 'connectDevice.checkingRelease' : 'connectDevice.download')}
+                    </Button>
+                  </li>
+                ))}
               </ul>
-              {!releaseTag && <p className={styles.availability}>{t('connectDevice.unreleased')}</p>}
+              {downloadError && (
+                <p className={styles.availability} role="status">
+                  {t(downloadError === 'unavailable' ? 'connectDevice.downloadUnavailable' : 'connectDevice.downloadFailed')}
+                </p>
+              )}
             </>
           )}
         </div>
