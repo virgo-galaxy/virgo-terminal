@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
-import type { DemoTerminalProps } from '@/examples/types';
 import styles from '../examples.module.css';
+import type { DemoTerminalProps } from '../types';
 import { loginMessage, prompt } from './fixtures';
 
 export function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrollback }: DemoTerminalProps) {

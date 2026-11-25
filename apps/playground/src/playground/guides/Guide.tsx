@@ -1,6 +1,6 @@
 import Markdown, { type Components } from 'react-markdown';
-import type { ExampleView } from '@/examples/types';
 import type { PlaygroundLocale } from '@/i18n/PlaygroundLocale';
+import type { ExampleView } from '../examples/types';
 import enLogs from './en-US/simulated-logs.md?raw';
 import enTerminal from './en-US/terminal.md?raw';
 import zhLogs from './zh-CN/simulated-logs.md?raw';
@@ -16,7 +16,7 @@ const guides = {
 };
 const markdownComponents: Components = { pre: GuideCodeBlock };
 
-export default function ExampleGuide({ view, locale }: {
+export default function Guide({ view, locale }: {
   view: GuideView;
   locale: PlaygroundLocale;
 }) {

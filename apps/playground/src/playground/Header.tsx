@@ -2,11 +2,11 @@ import { useState, type ReactNode } from 'react';
 import { CodeIcon, FileTextIcon, GithubIcon, LanguageIcon, MonitorIcon, MoonFilledIcon, SunFilledIcon } from '@virgo-design/icons';
 import { Button, Menu, SegmentedControl } from '@virgo-design/ui';
 import terminalLogo from '@/assets/virgo-terminal-logo.svg';
-import type { ExampleView } from '@/examples/types';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
-import styles from './playground.module.css';
+import type { ExampleView } from './examples/types';
+import styles from './header.module.css';
 
-export function Toolbar({ view, onSelectExample, children }: {
+export function Header({ view, onSelectExample, children }: {
   view: ExampleView;
   onSelectExample: (view: ExampleView) => void;
   children: ReactNode;
@@ -24,11 +24,11 @@ export function Toolbar({ view, onSelectExample, children }: {
   }
 
   return (
-    <div className={styles.toolbar}>
+    <div className={styles.header}>
       <img src={terminalLogo} alt="Virgo Terminal" width={24} height={24} />
       <SegmentedControl
         aria-label={t('toolbar.examples')}
-        className={styles.toolbarExamples!}
+        className={styles.examples!}
         size="small"
         variant="soft"
         motion="slide"
@@ -41,7 +41,7 @@ export function Toolbar({ view, onSelectExample, children }: {
           <SegmentedControl.Item value="shell" icon={<MonitorIcon />}>{t('toolbar.shell')}</SegmentedControl.Item>
         )}
       </SegmentedControl>
-      <div className={styles.toolbarActions}>
+      <div className={styles.actions}>
         <Button
           type="button"
           size="small"

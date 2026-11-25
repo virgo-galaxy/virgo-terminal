@@ -1,8 +1,8 @@
 import { SettingsIcon } from '@virgo-design/icons';
 import { Button, Drawer, Select, Separator, Switch } from '@virgo-design/ui';
 import type { CSSProperties } from 'react';
-import type { ShellOption } from '@/examples/local-shell/useShellOptions';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
+import type { ShellOption } from '../examples/local-shell/useShellOptions';
 import {
   defaultPreferences, fonts, historyLimits, scrollbarRadii, scrollbarWidths, sizes, themes, type TerminalPreferenceValues,
 } from './preferences';

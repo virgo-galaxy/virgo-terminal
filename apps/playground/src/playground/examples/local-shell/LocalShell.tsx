@@ -3,8 +3,8 @@ import { PlayFilledIcon } from '@virgo-design/icons';
 import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
-import type { DemoTerminalProps } from '@/examples/types';
 import styles from '../examples.module.css';
+import type { DemoTerminalProps } from '../types';
 import { useLocalShell } from './useLocalShell';
 
 export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, scrollback, shellId, visible }: DemoTerminalProps & {

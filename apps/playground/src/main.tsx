@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { monoFonts } from '@virgo-design/fonts';
 import { App } from '@/app/App';
-import { defaultFontSize } from '@/preferences/preferences';
+import { defaultFontSize } from '@/playground/preferences/preferences';
 import '@virgo-design/fonts/sans/inter.css';
 import '@virgo-design/fonts/mono/jetbrains-mono.css';
 import '@virgo-design/tokens/styles.css';

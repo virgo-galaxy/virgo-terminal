@@ -1,0 +1,27 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--vd-spacing-8);
+  min-inline-size: 0;
+  inline-size: 100%;
+}
+
+.examples {
+  max-inline-size: 100%;
+}
+
+@media (max-width: 360px) {
+  .header .examples {
+    --vd-control-small-padding-inline: var(--vd-spacing-4);
+    --segmented-icon-size: var(--vd-sizing-12);
+    --segmented-gap: var(--vd-spacing-2);
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--vd-spacing-8);
+  margin-inline-start: auto;
+}

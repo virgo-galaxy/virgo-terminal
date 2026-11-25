@@ -1,41 +1,13 @@
-.playground {
+.root {
   block-size: 100%;
   gap: var(--vd-spacing-12);
 }
 
-.playgroundContent {
+.content {
   display: flex;
 }
 
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--vd-spacing-8);
-  min-inline-size: 0;
-  inline-size: 100%;
-}
-
-.toolbarExamples {
-  max-inline-size: 100%;
-}
-
-@media (max-width: 360px) {
-  .toolbar .toolbarExamples {
-    --vd-control-small-padding-inline: var(--vd-spacing-4);
-    --segmented-icon-size: var(--vd-sizing-12);
-    --segmented-gap: var(--vd-spacing-2);
-  }
-}
-
-.toolbarActions {
-  display: flex;
-  align-items: center;
-  gap: var(--vd-spacing-8);
-  margin-inline-start: auto;
-}
-
-.splitView {
+.panels {
   --pane-divider-width: var(--vd-spacing-12);
   --pane-available-width: calc(100% - var(--pane-divider-width));
   --terminal-minimum: max(var(--terminal-min-width), calc(var(--pane-available-width) * var(--terminal-min-ratio)));
@@ -51,7 +23,7 @@
   min-height: 0;
 }
 
-.splitView[data-single-pane] {
+.panels[data-single-pane] {
   grid-template: "terminal" minmax(0, 1fr) / minmax(0, 1fr);
 }
 
@@ -107,7 +79,7 @@
 }
 
 @media (max-width: 900px) {
-  .splitView:not([data-single-pane]) {
+  .panels:not([data-single-pane]) {
     grid-template: "terminal" clamp(16rem, 43dvh, 24rem) "guide" auto / minmax(0, 1fr);
     align-content: start;
     gap: var(--vd-spacing-12);
