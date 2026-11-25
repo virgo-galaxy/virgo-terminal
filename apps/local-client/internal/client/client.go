@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/virgo-galaxy/virgo-terminal/apps/local-client/internal/connection"
+	"github.com/virgo-galaxy/virgo-terminal/apps/local-client/internal/shell"
 )
 
 const connectionPort = 43127 // Keep in sync with the Playground's device port.
@@ -26,10 +28,8 @@ func Run(playground string, printURL bool) error {
 	defer stop()
 
 	port := connectionPort
-	approve := confirmConnection
 	if printURL {
 		port = 0
-		approve = nil
 	}
 	listener, err := net.ListenTCP("tcp4", &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: port})
 	if err != nil {
@@ -39,7 +39,18 @@ func Run(playground string, printURL bool) error {
 
 	address := listener.Addr().(*net.TCPAddr)
 	origin := page.Scheme + "://" + page.Host
-	handler, key, err := connection.New(ctx, origin, address.String(), approve)
+	shells := shell.Options()
+	options := connection.Options{DefaultShell: shells[0]}
+	if !printURL {
+		trust, err := connection.NewBrowserTrust(origin)
+		if err != nil {
+			log.Printf("Read browser authorization: %v", err)
+		}
+		options.Desktop = &connection.DesktopSession{}
+		options.Trust = trust
+		options.Approve = confirmConnection
+	}
+	handler, key, err := connection.New(ctx, origin, address.String(), options)
 	if err != nil {
 		return fmt.Errorf("create pairing: %w", err)
 	}
@@ -73,9 +84,13 @@ func Run(playground string, printURL bool) error {
 		fmt.Println(page.String())
 		return serve()
 	}
-	fmt.Printf("Waiting for a connection from %s\n", origin)
 	query := page.Query()
 	query.Set("view", "connect-device")
 	page.RawQuery = query.Encode()
-	return runDesktopClient(page.String(), stop, serve)
+	return runDesktopClient(desktopConfig{
+		playgroundURL: page.String(),
+		shells:        shells,
+		session:       options.Desktop,
+		trust:         options.Trust,
+	}, stop, serve)
 }

@@ -1,6 +1,9 @@
 //go:build cgo
 
 #import <AppKit/AppKit.h>
+#include "_cgo_export.h"
+
+enum { VirgoIdle, VirgoWaiting, VirgoConnecting, VirgoConnected };
 
 static void stopApplication(void) {
     [NSApp stop:nil];
@@ -18,7 +21,11 @@ static void stopApplication(void) {
 
 @interface VirgoClientWindowDelegate : NSObject <NSWindowDelegate, NSApplicationDelegate>
 @property(nonatomic, retain) NSURL *playgroundURL;
+@property(nonatomic, assign) NSPopUpButton *shellPicker;
+@property(nonatomic, assign) NSButton *rememberBrowser;
 - (void)openPlayground:(id)sender;
+- (void)connect:(id)sender;
+- (void)forgetBrowser:(id)sender;
 @end
 
 @implementation VirgoClientWindowDelegate
@@ -29,6 +36,14 @@ static void stopApplication(void) {
 
 - (void)openPlayground:(id)sender {
     [NSWorkspace.sharedWorkspace openURL:self.playgroundURL];
+}
+
+- (void)connect:(id)sender {
+    virgoConnectShell((int)self.shellPicker.indexOfSelectedItem, self.rememberBrowser.state == NSControlStateValueOn);
+}
+
+- (void)forgetBrowser:(id)sender {
+    virgoForgetBrowser();
 }
 
 - (BOOL)windowShouldClose:(NSWindow *)window {
@@ -42,7 +57,7 @@ static void stopApplication(void) {
 }
 @end
 
-void virgoRunClientWindow(const char *playgroundURL) {
+void virgoRunClientWindow(const char *playgroundURL, const char *shellNames) {
     @autoreleasepool {
         NSApplication *app = [NSApplication sharedApplication];
         [app setActivationPolicy:NSApplicationActivationPolicyRegular];
@@ -55,13 +70,17 @@ void virgoRunClientWindow(const char *playgroundURL) {
         NSMenu *mainMenu = [[NSMenu alloc] init];
         NSMenu *appMenu = [[NSMenu alloc] init];
         NSMenuItem *appItem = [[NSMenuItem alloc] init];
+        NSMenuItem *forgetItem = [appMenu addItemWithTitle:(isChinese ? @"清除已记住的浏览器" : @"Forget Remembered Browser")
+                                                   action:@selector(forgetBrowser:) keyEquivalent:@""];
+        forgetItem.target = delegate;
+        [appMenu addItem:[NSMenuItem separatorItem]];
         NSMenuItem *quitItem = [appMenu addItemWithTitle:quitTitle action:@selector(terminate:) keyEquivalent:@"q"];
         quitItem.target = app;
         appItem.submenu = appMenu;
         [mainMenu addItem:appItem];
         app.mainMenu = mainMenu;
 
-        NSWindow *window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 360, 140)
+        NSWindow *window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 420, 215)
                                                       styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskFullSizeContentView
                                                         backing:NSBackingStoreBuffered
                                                           defer:NO];
@@ -80,9 +99,21 @@ void virgoRunClientWindow(const char *playgroundURL) {
         windowTitle.alignment = NSLayoutAttributeCenterY;
         windowTitle.spacing = 6;
 
-        NSTextField *status = [NSTextField labelWithString:isChinese
-            ? @"客户端已启动。"
-            : @"Client is running."];
+        NSArray<NSString *> *waitingStatuses = isChinese
+            ? @[@"等待连接中", @"等待浏览器连接…", @"正在连接…", @"已连接"]
+            : @[@"Waiting to connect", @"Waiting for the browser…", @"Connecting…", @"Connected"];
+        NSTextField *status = [NSTextField labelWithString:waitingStatuses[VirgoIdle]];
+        NSTextField *shellLabel = [NSTextField labelWithString:@"Shell"];
+        NSPopUpButton *shellPicker = [[[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO] autorelease];
+        [shellPicker addItemsWithTitles:[[NSString stringWithUTF8String:shellNames] componentsSeparatedByString:@"\n"]];
+        NSMenuItem *systemShell = [shellPicker itemAtIndex:0];
+        systemShell.title = [systemShell.title stringByAppendingString:(isChinese ? @"（系统默认）" : @" (System default)")];
+        shellPicker.accessibilityLabel = shellLabel.stringValue;
+        delegate.shellPicker = shellPicker;
+        NSButton *rememberBrowser = [NSButton checkboxWithTitle:(isChinese ? @"记住此浏览器" : @"Remember this browser")
+                                                        target:nil action:NULL];
+        rememberBrowser.state = NSControlStateValueOn;
+        delegate.rememberBrowser = rememberBrowser;
         NSString *linkTitle = isChinese ? @"打开 Playground" : @"Open Playground";
         NSButton *link = [NSButton buttonWithTitle:linkTitle target:delegate action:@selector(openPlayground:)];
         link.bordered = NO;
@@ -91,18 +122,16 @@ void virgoRunClientWindow(const char *playgroundURL) {
             NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
         }] autorelease];
         NSButton *quit = [NSButton buttonWithTitle:quitTitle target:app action:@selector(terminate:)];
-        windowTitle.translatesAutoresizingMaskIntoConstraints = NO;
-        status.translatesAutoresizingMaskIntoConstraints = NO;
-        link.translatesAutoresizingMaskIntoConstraints = NO;
-        quit.translatesAutoresizingMaskIntoConstraints = NO;
+        NSButton *connect = [NSButton buttonWithTitle:(isChinese ? @"连接" : @"Connect") target:delegate action:@selector(connect:)];
+        window.defaultButtonCell = connect.cell;
         NSView *content = window.contentView;
         NSLayoutGuide *body = window.contentLayoutGuide;
         NSLayoutGuide *titlebar = [[[NSLayoutGuide alloc] init] autorelease];
         [content addLayoutGuide:titlebar];
-        [content addSubview:windowTitle];
-        [content addSubview:status];
-        [content addSubview:link];
-        [content addSubview:quit];
+        for (NSView *view in @[windowTitle, status, shellLabel, shellPicker, rememberBrowser, link, quit, connect]) {
+            view.translatesAutoresizingMaskIntoConstraints = NO;
+            [content addSubview:view];
+        }
         [NSLayoutConstraint activateConstraints:@[
             [titlebar.topAnchor constraintEqualToAnchor:content.topAnchor],
             [titlebar.bottomAnchor constraintEqualToAnchor:body.topAnchor],
@@ -115,18 +144,37 @@ void virgoRunClientWindow(const char *playgroundURL) {
             [status.topAnchor constraintEqualToAnchor:body.topAnchor constant:24],
             [status.leadingAnchor constraintEqualToAnchor:content.leadingAnchor constant:24],
             [status.trailingAnchor constraintLessThanOrEqualToAnchor:content.trailingAnchor constant:-24],
+            [shellPicker.topAnchor constraintEqualToAnchor:status.bottomAnchor constant:16],
+            [shellPicker.leadingAnchor constraintEqualToAnchor:content.leadingAnchor constant:88],
+            [shellPicker.trailingAnchor constraintEqualToAnchor:content.trailingAnchor constant:-24],
+            [shellLabel.leadingAnchor constraintEqualToAnchor:status.leadingAnchor],
+            [shellLabel.centerYAnchor constraintEqualToAnchor:shellPicker.centerYAnchor],
+            [rememberBrowser.topAnchor constraintEqualToAnchor:shellPicker.bottomAnchor constant:12],
+            [rememberBrowser.leadingAnchor constraintEqualToAnchor:status.leadingAnchor],
             [link.leadingAnchor constraintEqualToAnchor:content.leadingAnchor constant:24],
             [link.centerYAnchor constraintEqualToAnchor:quit.centerYAnchor],
-            [quit.trailingAnchor constraintEqualToAnchor:content.trailingAnchor constant:-24],
+            [link.trailingAnchor constraintLessThanOrEqualToAnchor:quit.leadingAnchor constant:-16],
+            [connect.trailingAnchor constraintEqualToAnchor:content.trailingAnchor constant:-24],
+            [connect.centerYAnchor constraintEqualToAnchor:quit.centerYAnchor],
+            [quit.trailingAnchor constraintEqualToAnchor:connect.leadingAnchor constant:-8],
             [quit.bottomAnchor constraintEqualToAnchor:content.bottomAnchor constant:-20],
         ]];
 
+        NSTimer *statusTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) {
+            int state = virgoConnectionState();
+            status.stringValue = waitingStatuses[state];
+            BOOL idle = state == VirgoIdle;
+            connect.enabled = idle;
+            shellPicker.enabled = idle;
+            rememberBrowser.enabled = idle;
+        }];
         [window center];
         [window makeKeyAndOrderFront:nil];
         if (@available(macOS 14.0, *)) {
             [app activate];
         }
         [app run];
+        [statusTimer invalidate];
         [window orderOut:nil];
         window.delegate = nil;
         app.delegate = nil;

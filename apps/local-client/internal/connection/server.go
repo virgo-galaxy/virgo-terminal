@@ -21,20 +21,27 @@ type Server struct {
 	origin    string
 	address   string
 	pairing   *pairing
-	approve   func(context.Context, string) bool
+	options   Options
 	clientsMu sync.Mutex
 	clients   sync.WaitGroup
 }
 
-func New(ctx context.Context, origin, address string, approve func(context.Context, string) bool) (*Server, string, error) {
+type Options struct {
+	DefaultShell shell.Option
+	Desktop      *DesktopSession
+	Trust        *BrowserTrust
+	Approve      func(context.Context, string, bool) bool
+}
+
+func New(ctx context.Context, origin, address string, options Options) (*Server, string, error) {
 	pairing, err := newPairing()
 	if err != nil {
 		return nil, "", err
 	}
-	return &Server{ctx: ctx, origin: origin, address: address, pairing: pairing, approve: approve}, pairing.launch, nil
+	return &Server{ctx: ctx, origin: origin, address: address, pairing: pairing, options: options}, pairing.launch, nil
 }
 
-func (s *Server) Expired() bool { return s.pairing.expired() }
+func (s *Server) Expired() bool { return s.options.Desktop == nil && s.pairing.expired() }
 
 // Wait drains the WebSocket handlers after the client cancels the server context.
 func (s *Server) Wait() {
@@ -45,11 +52,13 @@ func (s *Server) Wait() {
 }
 
 type message struct {
-	Type string `json:"type"`
-	Key  string `json:"key"`
-	Data string `json:"data"`
-	Cols int    `json:"cols"`
-	Rows int    `json:"rows"`
+	Type            string `json:"type"`
+	Key             string `json:"key"`
+	BrowserKey      string `json:"browserKey,omitempty"`
+	ConnectInClient bool   `json:"connectInClient,omitempty"`
+	Data            string `json:"data"`
+	Cols            int    `json:"cols"`
+	Rows            int    `json:"rows"`
 }
 
 func (m message) validSize() bool {
@@ -63,6 +72,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Host != s.address || r.Header.Get("Origin") != s.origin {
 		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+	desktop := s.options.Desktop
+	if desktop != nil && desktop.State() != DesktopWaiting {
+		http.Error(w, "Waiting for the client", http.StatusServiceUnavailable)
 		return
 	}
 	s.clientsMu.Lock()
@@ -98,13 +112,28 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var sessionKey string
+	var rememberKey string
+	program := s.options.DefaultShell
 	switch {
-	case s.approve != nil && start.Type == "pair" && s.pairing.reserve():
-		defer s.pairing.release()
-		if !s.approvePairing(conn, &start) {
+	case desktop != nil && start.Type == "pair":
+		selected, remember, claimed := desktop.claim()
+		if !claimed {
+			_ = conn.Close(websocket.StatusTryAgainLater, "Waiting for the client")
 			return
 		}
-	case s.approve == nil && start.Type == "start" && start.validSize() && s.pairing.claim(start.Key):
+		defer desktop.finish()
+		program = selected
+		key := start.BrowserKey
+		_, validKey := browserDigest(key)
+		remember = remember && validKey
+		trusted := remember && s.options.Trust.Matches(key)
+		if !s.approvePairing(conn, &start, trusted, remember) {
+			return
+		}
+		if remember && !trusted {
+			rememberKey = key
+		}
+	case desktop == nil && start.Type == "start" && start.validSize() && s.pairing.claim(start.Key):
 		defer s.pairing.release()
 		sessionKey = s.pairing.session
 	default:
@@ -114,7 +143,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ctx, stop := context.WithCancel(s.ctx)
 	defer stop()
-	terminal, err := shell.Start(ctx, start.Cols, start.Rows)
+	terminal, err := shell.Start(ctx, program, start.Cols, start.Rows)
 	if err != nil {
 		log.Printf("Start shell: %v", err)
 		_ = conn.Close(websocket.StatusInternalError, "Could not start shell")
@@ -137,7 +166,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	s.pairing.complete()
+	if desktop == nil {
+		s.pairing.complete()
+	} else {
+		if rememberKey != "" {
+			if err := s.options.Trust.Remember(rememberKey); err != nil {
+				log.Printf("Remember browser: %v", err)
+			}
+		}
+		desktop.connected()
+	}
 
 	inputDone := make(chan struct{})
 	go func() {
@@ -171,23 +209,25 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_ = conn.Close(websocket.StatusNormalClosure, "Shell exited")
 }
 
-func (s *Server) approvePairing(conn *websocket.Conn, start *message) bool {
-	approvalCtx, stopApproval := context.WithTimeout(s.ctx, 30*time.Second)
-	defer stopApproval()
-	if wsjson.Write(approvalCtx, conn, message{Type: "awaiting-approval"}) != nil {
-		return false
-	}
-	if !s.approve(approvalCtx, s.origin) || approvalCtx.Err() != nil {
-		if s.ctx.Err() == nil {
-			_ = conn.Close(approvalDenied, "Connection was not approved")
+func (s *Server) approvePairing(conn *websocket.Conn, start *message, trusted, remember bool) bool {
+	if !trusted {
+		approvalCtx, stopApproval := context.WithTimeout(s.ctx, 30*time.Second)
+		defer stopApproval()
+		if wsjson.Write(approvalCtx, conn, message{Type: "awaiting-approval", ConnectInClient: true}) != nil {
+			return false
 		}
-		return false
+		if !s.options.Approve(approvalCtx, s.origin, remember) || approvalCtx.Err() != nil {
+			if s.ctx.Err() == nil {
+				_ = conn.Close(approvalDenied, "Connection was not approved")
+			}
+			return false
+		}
 	}
 
 	// Wait for the approved tab to send its current size before opening a shell.
 	startCtx, stopStart := context.WithTimeout(s.ctx, 10*time.Second)
 	defer stopStart()
-	if wsjson.Write(startCtx, conn, message{Type: "approved"}) != nil || wsjson.Read(startCtx, conn, start) != nil {
+	if wsjson.Write(startCtx, conn, message{Type: "approved", ConnectInClient: true}) != nil || wsjson.Read(startCtx, conn, start) != nil {
 		return false
 	}
 	if start.Type != "start" || !start.validSize() {

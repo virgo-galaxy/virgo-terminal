@@ -47,16 +47,6 @@ func (p *pairing) claim(key string) bool {
 	return true
 }
 
-func (p *pairing) reserve() bool {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if p.active || time.Now().After(p.expires) {
-		return false
-	}
-	p.active = true
-	return true
-}
-
 func (p *pairing) complete() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
