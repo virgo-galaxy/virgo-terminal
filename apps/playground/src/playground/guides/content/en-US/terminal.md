@@ -2,9 +2,13 @@
 
 Add an interactive terminal to a React page. This example writes a welcome message and echoes what you type.
 
+```bash
+npm install @virgo-terminal/react
+```
+
 ## Connect the terminal
 
-1. Import `Terminal` from the `@virgo-terminal/react` workspace package and load its stylesheet.
+1. Import `Terminal` from `@virgo-terminal/react` and load its stylesheet.
 2. Give the terminal container a height so `autoFit` can size it to the available space.
 3. Write the welcome message in `onReady`. Use `onData` to receive keyboard input and send it back to the terminal through `write()`.
 

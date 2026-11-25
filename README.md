@@ -38,7 +38,13 @@ Local Shell is available in local development. It starts with the system default
 
 ## Use the React component
 
-`@virgo-terminal/react` is currently available as a workspace package. This example echoes keyboard input back to the terminal. Give the terminal host a defined height so `autoFit` can size the viewport.
+Install `@virgo-terminal/react` in your React app.
+
+```sh
+npm install @virgo-terminal/react
+```
+
+This example echoes keyboard input back to the terminal. Give the terminal host a defined height so `autoFit` can size the viewport.
 
 ```tsx
 import { useRef } from 'react';

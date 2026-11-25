@@ -2,9 +2,13 @@
 
 在 React 页面中接入交互式终端。这个示例会显示一条欢迎语，并回显你输入的内容。
 
+```bash
+npm install @virgo-terminal/react
+```
+
 ## 接入终端
 
-1. 从工作区包 `@virgo-terminal/react` 导入 `Terminal`，并引入它的样式表。
+1. 从 `@virgo-terminal/react` 导入 `Terminal`，并引入它的样式表。
 2. 给终端容器设置高度，`autoFit` 会让终端适应可用空间。
 3. 在 `onReady` 中写入欢迎语。在 `onData` 中接收键盘输入，再用 `write()` 将它写回终端。
 

@@ -2,6 +2,10 @@
 
 Use a read-only terminal to display streaming logs. This example appends a timestamped log line every second and uses ANSI color for the log level.
 
+```bash
+npm install @virgo-terminal/react
+```
+
 ## Connect the log stream
 
 1. Set `readOnly` so the terminal accepts output while disabling keyboard input.

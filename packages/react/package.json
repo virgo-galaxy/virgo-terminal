@@ -1,8 +1,13 @@
 {
   "name": "@virgo-terminal/react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Composable React terminal SDK built on xterm.js.",
-  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/virgo-galaxy/virgo-terminal.git",
+    "directory": "packages/react"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,11 +15,12 @@
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
     "./styles.css": "./dist/styles.css"
   },
-  "files": ["dist", "README.md"],
+  "files": ["dist", "README.md", "LICENSE"],
   "sideEffects": ["**/*.css"],
   "publishConfig": { "access": "public" },
   "scripts": {
     "build": "node ../../scripts/build-package.mjs",
+    "prepack": "npm run build",
     "dev": "tsc -p tsconfig.build.json --watch",
     "typecheck": "tsc -p tsconfig.json"
   },

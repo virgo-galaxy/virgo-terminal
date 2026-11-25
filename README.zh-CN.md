@@ -38,7 +38,13 @@ Local Shell 在本地开发时可用。它默认使用系统 Shell，设置抽�
 
 ## 使用 React 组件
 
-`@virgo-terminal/react` 目前通过 pnpm 工作区使用。下面的示例把收到的键盘输入写回终端。请给终端容器设置高度，`autoFit` 会根据容器尺寸调整行列数。
+在 React 应用中安装 `@virgo-terminal/react`。
+
+```sh
+npm install @virgo-terminal/react
+```
+
+下面的示例把收到的键盘输入写回终端。请给终端容器设置高度，`autoFit` 会根据容器尺寸调整行列数。
 
 ```tsx
 import { useRef } from 'react';
