@@ -8,9 +8,10 @@ import type { TerminalPreferenceValues } from './preferences/preferences';
 import { TerminalPreferences } from './preferences/TerminalPreferences';
 import styles from './toolbar.module.css';
 
-export function Toolbar({ view, onSelectExample, preferences, onPreferencesChange, onRestoreDefaults }: {
+export function Toolbar({ view, onSelectExample, onConnectDevice, preferences, onPreferencesChange, onRestoreDefaults }: {
   view: PlaygroundView;
   onSelectExample: (view: PlaygroundView) => void;
+  onConnectDevice: () => void;
   preferences: TerminalPreferenceValues;
   onPreferencesChange: (change: Partial<TerminalPreferenceValues>) => void;
   onRestoreDefaults: () => void;
@@ -41,11 +42,12 @@ export function Toolbar({ view, onSelectExample, preferences, onPreferencesChang
       >
         <SegmentedControl.Item value="terminal" icon={<CodeIcon />}>{t('toolbar.terminal')}</SegmentedControl.Item>
         <SegmentedControl.Item value="logs" icon={<FileTextIcon />}>{t('toolbar.logs')}</SegmentedControl.Item>
-        {showLocalShellDemo ? (
+        {showLocalShellDemo && (
           <SegmentedControl.Item value="shell" icon={<MonitorIcon />}>{t('toolbar.shell')}</SegmentedControl.Item>
-        ) : (
-          <SegmentedControl.Item value="connect-device" icon={<MonitorPlugIcon />}>{t('toolbar.connectDevice')}</SegmentedControl.Item>
         )}
+        <SegmentedControl.Item value="connect-device" icon={<MonitorPlugIcon />} onClick={onConnectDevice}>
+          {t('toolbar.connectDevice')}
+        </SegmentedControl.Item>
       </SegmentedControl>
       <div className={styles.actions}>
         <Button

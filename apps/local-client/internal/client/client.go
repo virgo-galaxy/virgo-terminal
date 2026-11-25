@@ -74,5 +74,8 @@ func Run(playground string, printURL bool) error {
 		return serve()
 	}
 	fmt.Printf("Waiting for a connection from %s\n", origin)
+	query := page.Query()
+	query.Set("view", "connect-device")
+	page.RawQuery = query.Encode()
 	return runDesktopClient(page.String(), stop, serve)
 }

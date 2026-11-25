@@ -1,12 +1,13 @@
+import type { PlaygroundView } from '../views';
 import { InteractiveTerminal } from './samples/interactive-terminal/InteractiveTerminal';
 import { LocalShell } from './samples/local-shell/LocalShell';
 import { SimulatedLogs } from './samples/simulated-logs/SimulatedLogs';
-import type { DemoTerminalProps, ExampleView } from './types';
+import type { DemoTerminalProps } from './types';
 
 export type ShellSession = { attempt: number; shellId: string };
 
 export function Terminal({ view, options, showBackToTop, shellSession, onRestartShell }: {
-  view: ExampleView;
+  view: PlaygroundView;
   options: DemoTerminalProps;
   showBackToTop: boolean;
   shellSession: ShellSession | null;

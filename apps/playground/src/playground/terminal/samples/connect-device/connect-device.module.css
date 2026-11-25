@@ -11,8 +11,11 @@
 }
 
 .setup h1 {
-  margin: 0 0 var(--vd-spacing-12);
-  font-size: var(--vd-font-size-32);
+  margin: 0 0 var(--vd-spacing-16);
+  font-family: var(--vd-typography-document-heading-1-font-family);
+  font-size: var(--vd-typography-document-heading-1-font-size);
+  font-weight: var(--vd-typography-document-heading-1-font-weight);
+  line-height: var(--vd-typography-document-heading-1-line-height);
   text-wrap: balance;
 }
 

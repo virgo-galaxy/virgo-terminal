@@ -1,7 +1,7 @@
-import { AppleIcon, DownloadIcon, MonitorIcon, WindowsIcon } from '@virgo-design/icons';
+import { AppleIcon, DownloadIcon, WindowsIcon } from '@virgo-design/icons';
 import { Button, Tooltip } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import type { DemoTerminalProps } from '../../types';
 import { getLatestClientDownload, type ClientDownload } from './clientRelease';
@@ -34,7 +34,10 @@ function renderInstruction(text: string) {
   ));
 }
 
-export function ConnectDevice({ options, ticket, visible }: {
+export type ConnectDeviceHandle = { connect(): void };
+
+export function ConnectDevice({ ref, options, ticket, visible }: {
+  ref: Ref<ConnectDeviceHandle>;
   options: DemoTerminalProps;
   ticket: DeviceTicket | null;
   visible: boolean;
@@ -42,17 +45,19 @@ export function ConnectDevice({ options, ticket, visible }: {
   const { locale, t } = usePlaygroundLocale();
   const terminal = useRef<TerminalHandle>(null);
   const downloadLookup = useRef<Promise<ClientDownload | null> | null>(null);
-  const { status, connect, start, sendInput, sendSize } = useDeviceConnection(ticket, terminal);
   const [platform] = useState(getClientPlatform);
   const download = platform ? downloads[platform] : null;
+  const { status, access, connect, start, sendInput, sendSize } = useDeviceConnection(ticket, terminal, download !== null || ticket !== null, visible);
   const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<'unavailable' | 'failed' | null>(null);
   const [versionHint, setVersionHint] = useState<VersionHint>('connectDevice.checkingRelease');
   const [macHelpOpened, setMacHelpOpened] = useState(false);
-  const needsSetup = status === 'idle' || status === 'failed' || status === 'denied';
+  const needsSetup = status === 'idle' || status === 'waiting' || status === 'failed' || status === 'denied';
   const hasLaunchTicket = status === 'idle' && ticket !== null;
-  const canConnect = hasLaunchTicket || download !== null;
-  const instructions = download ? 'connectDevice.instructions' : 'connectDevice.unsupportedPlatform';
+  let instructions = t('connectDevice.instructions');
+  if (!download && !hasLaunchTicket) instructions = t('connectDevice.unsupportedPlatform');
+  else if (access === 'denied') instructions = t('connectDevice.browserAccessDenied');
+  else if (access === 'prompt' || access === 'manual') instructions = t('connectDevice.browserAccess');
   const macOpenCommand = `# ${t('connectDevice.macExtractStep')}
 ditto -x -k "$HOME/Downloads/${downloads.macos.filename}" "$HOME/Downloads"
 
@@ -61,6 +66,8 @@ xattr -dr com.apple.quarantine "$HOME/Downloads/Virgo Terminal Client.app"
 
 # ${t('connectDevice.macLaunchStep')}
 open "$HOME/Downloads/Virgo Terminal Client.app"`;
+
+  useImperativeHandle(ref, () => ({ connect: () => connect() }), [connect]);
 
   useEffect(() => {
     if (visible && status === 'connected') terminal.current?.focus();
@@ -109,13 +116,8 @@ open "$HOME/Downloads/Virgo Terminal Client.app"`;
       {needsSetup ? (
         <div className={styles.setup}>
           <h1>{t('toolbar.connectDevice')}</h1>
-          <p>{renderInstruction(t(hasLaunchTicket ? 'connectDevice.authorize' : instructions))}</p>
-          {canConnect && (
-            <Button type="button" leadingIcon={<MonitorIcon aria-hidden="true" />} onClick={connect}>
-              {t('connectDevice.connect')}
-            </Button>
-          )}
-          {status !== 'idle' && <p className={styles.availability} role="status">{t(`connectDevice.${status}`)}</p>}
+          <p>{renderInstruction(instructions)}</p>
+          {status === 'denied' && <p className={styles.availability} role="status">{t('connectDevice.denied')}</p>}
           {!hasLaunchTicket && download && (
             <>
               <ul className={styles.downloads}>
@@ -200,7 +202,7 @@ open "$HOME/Downloads/Virgo Terminal Client.app"`;
             <div className={styles.status}>
               <span role="status">{t(`connectDevice.${status}`)}</span>
               {status === 'exited' && (
-                <Button type="button" size="small" onClick={connect}>{t('connectDevice.retry')}</Button>
+                <Button type="button" size="small" onClick={() => connect()}>{t('connectDevice.retry')}</Button>
               )}
             </div>
           )}
