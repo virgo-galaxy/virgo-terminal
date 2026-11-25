@@ -5,6 +5,7 @@ packages:
 allowBuilds:
   esbuild: true
   node-pty: true
+  protobufjs: false
 
 minimumReleaseAgeExclude:
   - '@virgo-design/colors@0.1.1'
@@ -14,3 +15,4 @@ minimumReleaseAgeExclude:
   - '@virgo-design/themes@0.1.1'
   - '@virgo-design/tokens@0.1.1'
   - '@virgo-design/ui@0.1.1'
+  - '@virgo-nsh/highlighter@0.1.1'

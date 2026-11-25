@@ -16,7 +16,9 @@ export function Toolbar({ view, onSelectExample, children }: {
   const colorModeLabel = t(darkMode ? 'toolbar.switchToLight' : 'toolbar.switchToDark');
 
   function toggleColorMode() {
-    document.documentElement.dataset.theme = darkMode ? 'light' : 'dark';
+    const mode = darkMode ? 'light' : 'dark';
+    document.documentElement.dataset.theme = mode;
+    document.documentElement.dataset.nshTheme = mode;
     setDarkMode(!darkMode);
   }
 
