@@ -42,8 +42,8 @@ importers:
         specifier: 0.1.1
         version: 0.1.1
       '@virgo-design/icons':
-        specifier: 0.1.1
-        version: 0.1.1(react@19.3.1)
+        specifier: 0.1.3
+        version: 0.1.3(react@19.3.1)
       '@virgo-design/themes':
         specifier: 0.1.1
         version: 0.1.1
@@ -658,6 +658,11 @@ packages:
 
   '@virgo-design/icons@0.1.1':
     resolution: {integrity: sha512-estczJv3XbA8U/F1WgBbjuxqywvbMwy2GUo/CsxhZB2obUyk0VYxlD1n7G1PirwASuRPJAbaL25UtMG4hATM7Q==}
+    peerDependencies:
+      react: '>=18.0.0'
+
+  '@virgo-design/icons@0.1.3':
+    resolution: {integrity: sha512-3uyPnReW+D0DFBRTVxbnIPtrIcsLqqkqw/bRaOyfVnTcNnihPD5ZmU21XMXmq8z2OA2ajQRg6bEpKGK7TRdlTQ==}
     peerDependencies:
       react: '>=18.0.0'
 
@@ -2210,6 +2215,10 @@ snapshots:
       '@fontsource-variable/source-code-pro': 5.3.1
 
   '@virgo-design/icons@0.1.1(react@19.3.1)':
+    dependencies:
+      react: 19.3.1
+
+  '@virgo-design/icons@0.1.3(react@19.3.1)':
     dependencies:
       react: 19.3.1
 
