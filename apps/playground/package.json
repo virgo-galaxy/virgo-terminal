@@ -14,7 +14,8 @@
     "@virgo-design/ui": "0.1.1",
     "@virgo-terminal/react": "workspace:*",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "react-markdown": "10.1.0"
   },
   "devDependencies": {
     "@types/react": "19.3.0",

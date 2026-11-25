@@ -26,7 +26,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-打开 [localhost:3000](http://127.0.0.1:3000/)。每个示例都可以在 **Preview** 和 **Code** 之间切换。
+打开 [localhost:3000](http://127.0.0.1:3000/)。**Terminal** 和 **Simulated logs** 都有实时演示和中英文接入指南。
 
 | 示例 | 内容 |
 | --- | --- |

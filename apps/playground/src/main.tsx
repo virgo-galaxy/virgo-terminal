@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { monoFonts } from '@virgo-design/fonts';
 import { App } from '@/app/App';
+import { PlaygroundLocaleProvider } from '@/app/i18n/PlaygroundLocale';
 import { defaultFontSize } from '@/preferences/preferences';
 import '@virgo-design/fonts/sans/inter.css';
 import '@virgo-design/fonts/mono/jetbrains-mono.css';
@@ -19,6 +20,8 @@ void document.fonts.load(`${defaultFontSize}px ${monoFonts.jetbrainsMono.cssFami
   .catch(() => [])
   .then((faces) => app.render(
     <StrictMode>
-      <App initialFont={faces.length ? 'jetbrains' : 'system'} />
+      <PlaygroundLocaleProvider>
+        <App initialFont={faces.length ? 'jetbrains' : 'system'} />
+      </PlaygroundLocaleProvider>
     </StrictMode>,
   ));

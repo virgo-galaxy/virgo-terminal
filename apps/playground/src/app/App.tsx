@@ -1,19 +1,22 @@
-import { useState } from 'react';
-import { ExampleSource } from '@/code/ExampleSource';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { InteractiveTerminal } from '@/examples/interactive-terminal/InteractiveTerminal';
 import { LocalShell } from '@/examples/local-shell/LocalShell';
 import { useShellOptions } from '@/examples/local-shell/useShellOptions';
 import { SimulatedLogs } from '@/examples/simulated-logs/SimulatedLogs';
-import type { DemoTerminalProps, ExampleView, Presentation } from '@/examples/types';
+import type { DemoTerminalProps, ExampleView } from '@/examples/types';
 import { TerminalPreferences } from '@/preferences/TerminalPreferences';
 import { defaultPreferences, fonts, themes, type TerminalPreferenceValues } from '@/preferences/preferences';
+import { PlaygroundLayout } from './PlaygroundLayout';
 import { Toolbar } from './Toolbar';
+import { usePlaygroundLocale } from './i18n/PlaygroundLocale';
 
 type ShellSession = { attempt: number; shellId: string };
+const ExampleGuide = lazy(() => import('@/guides/ExampleGuide'));
 
 export function App({ initialFont }: { initialFont: TerminalPreferenceValues['font'] }) {
   const [view, setView] = useState<ExampleView>('terminal');
-  const [presentation, setPresentation] = useState<Presentation>('preview');
+  const { locale, t } = usePlaygroundLocale();
+  const layout = useRef<HTMLElement>(null);
   const [shellSession, setShellSession] = useState<ShellSession | null>(null);
   const [preferences, setPreferences] = useState<TerminalPreferenceValues>(
     () => ({ ...defaultPreferences, font: initialFont }),
@@ -39,15 +42,15 @@ export function App({ initialFont }: { initialFont: TerminalPreferenceValues['fo
     setShellSession((session) => ({ attempt: (session?.attempt ?? 0) + 1, shellId: preferences.shellId }));
   }
 
-  function selectExample(nextView: ExampleView, nextPresentation: Presentation) {
+  function selectExample(nextView: ExampleView) {
+    layout.current?.scrollTo(0, 0);
     setView(nextView);
-    setPresentation(nextPresentation);
-    if (nextView === 'shell' && nextPresentation === 'preview' && !shellSession) startShell();
+    if (nextView === 'shell' && !shellSession) startShell();
   }
 
   return (
     <>
-      <Toolbar view={view} presentation={presentation} onSelectExample={selectExample}>
+      <Toolbar view={view} onSelectExample={selectExample}>
         <TerminalPreferences
           preferences={preferences}
           shellOptions={shellOptions}
@@ -55,25 +58,32 @@ export function App({ initialFont }: { initialFont: TerminalPreferenceValues['fo
           onRestoreDefaults={() => setPreferences({ ...defaultPreferences, font: initialFont })}
         />
       </Toolbar>
-      <main
-        className="terminal-frame"
-        style={presentation === 'preview' ? { backgroundColor: appearance.theme.background } : undefined}
-      >
-        <div className="example-preview" hidden={presentation !== 'preview'}>
-          {view === 'terminal' && <InteractiveTerminal {...demoTerminalProps} visible={presentation === 'preview'} />}
-          {view === 'logs' && <SimulatedLogs {...demoTerminalProps} showBackToTop={preferences.showBackToTop} />}
-          {import.meta.env.DEV && shellSession && (
-            <LocalShell
-              key={shellSession.attempt}
-              {...demoTerminalProps}
-              onRestart={startShell}
-              shellId={shellSession.shellId}
-              visible={view === 'shell' && presentation === 'preview'}
-            />
-          )}
-        </div>
-        {presentation === 'code' && <ExampleSource key={view} view={view} />}
-      </main>
+      <PlaygroundLayout
+        view={view}
+        layoutRef={layout}
+        terminal={(
+          <div className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
+            {view === 'terminal' && <InteractiveTerminal {...demoTerminalProps} />}
+            {view === 'logs' && <SimulatedLogs {...demoTerminalProps} showBackToTop={preferences.showBackToTop} />}
+            {import.meta.env.DEV && shellSession && (
+              <LocalShell
+                key={shellSession.attempt}
+                {...demoTerminalProps}
+                onRestart={startShell}
+                shellId={shellSession.shellId}
+                visible={view === 'shell'}
+              />
+            )}
+          </div>
+        )}
+        guide={view !== 'shell' && (
+          <div className="guide-frame" id="playground-guide" key={view}>
+            <Suspense fallback={<p className="guide-loading" role="status">{t('guide.loading')}</p>}>
+              <ExampleGuide view={view} locale={locale} />
+            </Suspense>
+          </div>
+        )}
+      />
     </>
   );
 }

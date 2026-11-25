@@ -3,15 +3,13 @@ import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import type { DemoTerminalProps } from '@/examples/types';
 import { loginMessage, prompt } from './fixtures';
 
-export function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrollback, visible }: DemoTerminalProps & {
-  visible: boolean;
-}) {
+export function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrollback }: DemoTerminalProps) {
   const terminal = useRef<TerminalHandle>(null);
   const inputLength = useRef(0);
 
   useEffect(() => {
-    if (visible) terminal.current?.focus();
-  }, [visible]);
+    terminal.current?.focus();
+  }, []);
 
   return (
     <Terminal

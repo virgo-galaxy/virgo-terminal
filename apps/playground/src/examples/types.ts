@@ -8,4 +8,3 @@ export type DemoTerminalProps = {
 };
 
 export type ExampleView = 'terminal' | 'logs' | 'shell';
-export type Presentation = 'preview' | 'code';

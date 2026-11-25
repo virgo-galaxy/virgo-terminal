@@ -1,0 +1,72 @@
+.example-guide {
+  max-inline-size: 72ch;
+  margin-inline: auto;
+  padding: var(--vd-spacing-16) clamp(var(--vd-spacing-12), 4vw, var(--vd-spacing-40)) var(--vd-spacing-40);
+  font-family: var(--vd-typography-document-body-large-font-family);
+  font-size: var(--vd-typography-document-body-large-font-size);
+  font-weight: var(--vd-typography-document-body-large-font-weight);
+  line-height: var(--vd-typography-document-body-large-line-height);
+  overflow-wrap: anywhere;
+}
+
+.example-guide h1 {
+  margin: 0 0 var(--vd-spacing-16);
+  font-family: var(--vd-typography-document-heading-1-font-family);
+  font-size: var(--vd-typography-document-heading-1-font-size);
+  font-weight: var(--vd-typography-document-heading-1-font-weight);
+  line-height: var(--vd-typography-document-heading-1-line-height);
+  text-wrap: balance;
+}
+
+.example-guide h2 {
+  margin: var(--vd-spacing-40) 0 var(--vd-spacing-12);
+  font-family: var(--vd-typography-document-heading-2-font-family);
+  font-size: var(--vd-typography-document-heading-2-font-size);
+  font-weight: var(--vd-typography-document-heading-2-font-weight);
+  line-height: var(--vd-typography-document-heading-2-line-height);
+  text-wrap: balance;
+}
+
+.example-guide :is(p, ol, ul, pre) {
+  margin: 0 0 var(--vd-spacing-16);
+}
+
+.example-guide :is(ol, ul) {
+  padding-inline-start: var(--vd-spacing-24);
+}
+
+.example-guide li + li {
+  margin-block-start: var(--vd-spacing-4);
+}
+
+.example-guide :is(pre, code) {
+  font-family: var(--vd-font-family-mono);
+  font-size: var(--vd-typography-document-body-medium-font-size);
+}
+
+.example-guide code:not(pre code) {
+  padding: var(--vd-spacing-2) var(--vd-spacing-4);
+  border: 1px solid var(--vd-border-default);
+  border-radius: var(--vd-shape-radius-4);
+  background-color: var(--vd-surface-secondary);
+}
+
+.example-guide pre {
+  overflow: auto;
+  padding: var(--vd-spacing-16);
+  border: 1px solid var(--vd-border-default);
+  border-radius: var(--vd-shape-radius-6);
+  background-color: var(--vd-surface-default);
+  tab-size: 2;
+  scrollbar-color: var(--vd-border-default) transparent;
+}
+
+.example-guide a {
+  color: var(--vd-brand-primary);
+  text-underline-offset: 0.2em;
+}
+
+.example-guide a:focus-visible {
+  outline: var(--vd-border-width-2) solid var(--vd-border-focus);
+  outline-offset: var(--vd-spacing-2);
+}

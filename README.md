@@ -26,7 +26,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open [localhost:3000](http://127.0.0.1:3000/). Each example has a **Preview** and a **Code** view.
+Open [localhost:3000](http://127.0.0.1:3000/). **Terminal** and **Simulated logs** pair live demos with integration guides in English and Simplified Chinese.
 
 | Example | What it demonstrates |
 | --- | --- |

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUpIcon } from '@virgo-design/icons';
 import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
+import { usePlaygroundLocale } from '@/app/i18n/PlaygroundLocale';
 import type { DemoTerminalProps } from '@/examples/types';
 import { formatLogLine } from './lib/formatLogLine';
 
@@ -11,6 +12,8 @@ const logIntervalMs = 500;
 export function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback, showBackToTop }: DemoTerminalProps & {
   showBackToTop: boolean;
 }) {
+  const { t } = usePlaygroundLocale();
+  const backToTopLabel = t('logs.backToTop');
   const terminal = useRef<TerminalHandle>(null);
   const [canScrollUp, setCanScrollUp] = useState(false);
 
@@ -53,8 +56,8 @@ export function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback,
           variant="secondary"
           size="small"
           iconOnly
-          aria-label="Back to top"
-          title="Back to top"
+          aria-label={backToTopLabel}
+          title={backToTopLabel}
           onClick={() => {
             terminal.current?.focus();
             terminal.current?.scrollToTop();

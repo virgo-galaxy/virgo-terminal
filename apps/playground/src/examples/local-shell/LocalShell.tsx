@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PlayFilledIcon } from '@virgo-design/icons';
 import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
+import { usePlaygroundLocale } from '@/app/i18n/PlaygroundLocale';
 import type { DemoTerminalProps } from '@/examples/types';
 import { useLocalShell } from './useLocalShell';
 
@@ -10,6 +11,7 @@ export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, scr
   shellId: string;
   visible: boolean;
 }) {
+  const { t } = usePlaygroundLocale();
   const terminal = useRef<TerminalHandle>(null);
   const [ready, setReady] = useState(false);
   const { closed, sendSize, sendInput } = useLocalShell(terminal, ready, shellId);
@@ -41,7 +43,7 @@ export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, scr
             leadingIcon={<PlayFilledIcon />}
             onClick={onRestart}
           >
-            Start shell
+            {t('shell.start')}
           </Button>
         </div>
       )}
