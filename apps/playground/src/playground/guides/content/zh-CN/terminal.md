@@ -2,6 +2,8 @@
 
 在 React 页面中接入交互式终端。这个示例会显示一条欢迎语，并回显你输入的内容。
 
+## 安装
+
 ```bash
 npm install @virgo-terminal/react
 ```

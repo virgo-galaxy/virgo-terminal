@@ -2,6 +2,8 @@
 
 Use a read-only terminal to display streaming logs. This example appends a timestamped log line every second and uses ANSI color for the log level.
 
+## Install
+
 ```bash
 npm install @virgo-terminal/react
 ```

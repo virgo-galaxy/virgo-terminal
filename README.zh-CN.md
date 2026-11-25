@@ -22,13 +22,15 @@
 
 Virgo Terminal 是用于交互终端和流式日志的 React 组件，支持显示 ANSI 输出。应用可以通过自己的连接层对接 Shell，转发终端输入和输出。终端基于 [xterm.js](https://xtermjs.org/)。
 
-## 使用 React 组件
+## 安装
 
 在 React 18.2 及以上的 18.x 版本或 React 19 应用中安装 `@virgo-terminal/react`。
 
 ```sh
 npm install @virgo-terminal/react
 ```
+
+## 使用 React 组件
 
 下面的示例把收到的键盘输入写回终端。请给终端容器设置高度，`autoFit` 会根据容器尺寸调整行列数。
 

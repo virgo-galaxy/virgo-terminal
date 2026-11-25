@@ -22,13 +22,15 @@
 
 Virgo Terminal is a React component for interactive terminals and streaming logs. It displays ANSI output and lets your application connect terminal input and output to a shell over its own transport. The component is built on [xterm.js](https://xtermjs.org/).
 
-## Use the React component
+## Install
 
 Install `@virgo-terminal/react` in an app using React 18.2 or later in the 18.x series, or React 19.
 
 ```sh
 npm install @virgo-terminal/react
 ```
+
+## Use the React component
 
 This example echoes keyboard input back to the terminal. Give the terminal host a defined height so `autoFit` can size the viewport.
 

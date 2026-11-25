@@ -2,6 +2,8 @@
 
 Add an interactive terminal to a React page. This example writes a welcome message and echoes what you type.
 
+## Install
+
 ```bash
 npm install @virgo-terminal/react
 ```

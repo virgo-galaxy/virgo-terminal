@@ -2,6 +2,8 @@
 
 用只读终端显示流式日志。这个示例每秒追加一条带时间戳的日志，并用 ANSI 转义序列给日志级别上色。
 
+## 安装
+
 ```bash
 npm install @virgo-terminal/react
 ```
