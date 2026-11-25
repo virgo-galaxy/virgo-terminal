@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { showLocalShellDemo } from '@/playground/views';
 
 export type ShellOption = { id: string; label: string };
 
@@ -8,7 +9,7 @@ export function useShellOptions(defaultShellId: string) {
   );
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    if (!showLocalShellDemo) return;
 
     const request = new AbortController();
     void fetch('/local-shell/options', { signal: request.signal }).then(async (response) => {

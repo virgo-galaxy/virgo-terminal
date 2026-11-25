@@ -3,6 +3,7 @@ export const enUS = {
   'toolbar.terminal': 'Terminal',
   'toolbar.logs': 'Simulated logs',
   'toolbar.shell': 'Local Shell',
+  'toolbar.connectDevice': 'Connect device',
   'toolbar.language': 'Language',
   'toolbar.switchToLight': 'Switch to light mode',
   'toolbar.switchToDark': 'Switch to dark mode',
@@ -36,6 +37,17 @@ export const enUS = {
   'preferences.restoreDefaults': 'Restore defaults',
   'logs.backToTop': 'Back to top',
   'shell.start': 'Start shell',
+  'connectDevice.instructions': 'Download and open the Virgo Terminal client to use this computer’s shell in the browser.',
+  'connectDevice.macos': 'macOS Universal',
+  'connectDevice.windows': 'Windows x64',
+  'connectDevice.download': 'Download',
+  'connectDevice.unreleased': 'Client downloads will appear here after the first release.',
+  'connectDevice.authorize': 'Connect to the running Virgo Terminal client. If the browser asks for local access, choose Allow.',
+  'connectDevice.connect': 'Connect',
+  'connectDevice.connecting': 'Connecting to this computer…',
+  'connectDevice.exited': 'Shell exited.',
+  'connectDevice.failed': 'Could not connect. Check that the client is running and the browser allows local access.',
+  'connectDevice.retry': 'Reconnect',
 };
 
 export type MessageKey = keyof typeof enUS;

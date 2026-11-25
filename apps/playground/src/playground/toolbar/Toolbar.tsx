@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { CodeIcon, FileTextIcon, GithubIcon, LanguageIcon, MonitorIcon, MoonFilledIcon, SunFilledIcon } from '@virgo-design/icons';
+import { CodeIcon, FileTextIcon, GithubIcon, LanguageIcon, MonitorIcon, MonitorPlugIcon, MoonFilledIcon, SunFilledIcon } from '@virgo-design/icons';
 import { Button, Menu, SegmentedControl } from '@virgo-design/ui';
 import terminalLogo from '@/assets/virgo-terminal-logo.svg';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
-import type { ExampleView } from '../terminal/types';
+import { showLocalShellDemo, type PlaygroundView } from '../views';
 import type { TerminalPreferenceValues } from './preferences/preferences';
 import { TerminalPreferences } from './preferences/TerminalPreferences';
 import styles from './toolbar.module.css';
 
 export function Toolbar({ view, onSelectExample, preferences, onPreferencesChange, onRestoreDefaults }: {
-  view: ExampleView;
-  onSelectExample: (view: ExampleView) => void;
+  view: PlaygroundView;
+  onSelectExample: (view: PlaygroundView) => void;
   preferences: TerminalPreferenceValues;
   onPreferencesChange: (change: Partial<TerminalPreferenceValues>) => void;
   onRestoreDefaults: () => void;
@@ -37,12 +37,14 @@ export function Toolbar({ view, onSelectExample, preferences, onPreferencesChang
         variant="soft"
         motion="slide"
         value={view}
-        onValueChange={(value) => onSelectExample(value as ExampleView)}
+        onValueChange={(value) => onSelectExample(value as PlaygroundView)}
       >
         <SegmentedControl.Item value="terminal" icon={<CodeIcon />}>{t('toolbar.terminal')}</SegmentedControl.Item>
         <SegmentedControl.Item value="logs" icon={<FileTextIcon />}>{t('toolbar.logs')}</SegmentedControl.Item>
-        {import.meta.env.DEV && (
+        {showLocalShellDemo ? (
           <SegmentedControl.Item value="shell" icon={<MonitorIcon />}>{t('toolbar.shell')}</SegmentedControl.Item>
+        ) : (
+          <SegmentedControl.Item value="connect-device" icon={<MonitorPlugIcon />}>{t('toolbar.connectDevice')}</SegmentedControl.Item>
         )}
       </SegmentedControl>
       <div className={styles.actions}>

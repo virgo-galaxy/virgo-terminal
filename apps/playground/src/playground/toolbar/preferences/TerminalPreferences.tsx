@@ -3,6 +3,7 @@ import { Button, Drawer, Select, Separator, Switch } from '@virgo-design/ui';
 import type { CSSProperties } from 'react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import { useShellOptions } from '../../terminal/samples/local-shell/useShellOptions';
+import { showLocalShellDemo } from '../../views';
 import {
   defaultPreferences, fonts, historyLimits, scrollbarRadii, scrollbarWidths, sizes, themes, type TerminalPreferenceValues,
 } from './preferences';
@@ -25,7 +26,7 @@ export function TerminalPreferences({ preferences, onChange, onRestoreDefaults }
     <Drawer>
       <Drawer.Trigger
         render={(props) => (
-          <Button {...props} size="small" variant="outline" iconOnly aria-label={t('preferences.title')}>
+          <Button {...props} className={styles.trigger!} size="small" variant="outline" iconOnly aria-label={t('preferences.title')}>
             <SettingsIcon aria-hidden="true" />
           </Button>
         )}
@@ -127,7 +128,7 @@ export function TerminalPreferences({ preferences, onChange, onRestoreDefaults }
                   </Select.Content>
                 </Select>
               </div>
-              {import.meta.env.DEV && (
+              {showLocalShellDemo && (
                 <>
                   <div className={styles.field}>
                     <span id="local-shell-label">{t('preferences.shell')}</span>

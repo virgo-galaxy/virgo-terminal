@@ -1,15 +1,19 @@
-import { lazy, useRef, useState } from 'react';
+import { lazy, useEffect, useRef, useState } from 'react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import { Layout } from '@/layout/Layout';
+import { ConnectDevice } from './terminal/samples/connect-device/ConnectDevice';
+import { clearLaunchTicket, readDeviceTicket } from './terminal/samples/connect-device/deviceTicket';
 import { Terminal, type ShellSession } from './terminal/Terminal';
-import type { DemoTerminalProps, ExampleView } from './terminal/types';
+import type { DemoTerminalProps } from './terminal/types';
 import { defaultPreferences, fonts, themes, type TerminalPreferenceValues } from './toolbar/preferences/preferences';
 import { Toolbar } from './toolbar/Toolbar';
+import { showLocalShellDemo, type PlaygroundView } from './views';
 
 const Guide = lazy(() => import('./guides/Guide'));
 
 export function Playground({ initialFont }: { initialFont: TerminalPreferenceValues['font'] }) {
-  const [view, setView] = useState<ExampleView>('terminal');
+  const [deviceTicket] = useState(() => showLocalShellDemo ? null : readDeviceTicket());
+  const [view, setView] = useState<PlaygroundView>(deviceTicket ? 'connect-device' : 'terminal');
   const { locale } = usePlaygroundLocale();
   const content = useRef<HTMLDivElement>(null);
   const [shellSession, setShellSession] = useState<ShellSession | null>(null);
@@ -32,11 +36,15 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
     scrollback: Number(preferences.history),
   };
 
+  useEffect(() => {
+    if (!showLocalShellDemo) clearLaunchTicket();
+  }, []);
+
   function startShell() {
     setShellSession((session) => ({ attempt: (session?.attempt ?? 0) + 1, shellId: preferences.shellId }));
   }
 
-  function selectExample(nextView: ExampleView) {
+  function selectExample(nextView: PlaygroundView) {
     content.current?.scrollTo(0, 0);
     setView(nextView);
     if (nextView === 'shell' && !shellSession) startShell();
@@ -54,17 +62,24 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
           onRestoreDefaults={() => setPreferences({ ...defaultPreferences, font: initialFont })}
         />
       )}
-      guide={<Guide view={view} locale={locale} />}
+      guide={view === 'connect-device' ? null : <Guide view={view} locale={locale} />}
       guideKey={view}
-      terminalStyle={{ backgroundColor: appearance.theme.background }}
+      terminalStyle={view === 'connect-device' ? {} : { backgroundColor: appearance.theme.background }}
       terminal={(
-        <Terminal
-          view={view}
-          options={demoTerminalProps}
-          showBackToTop={preferences.showBackToTop}
-          shellSession={shellSession}
-          onRestartShell={startShell}
-        />
+        <>
+          {view !== 'connect-device' && (
+            <Terminal
+              view={view}
+              options={demoTerminalProps}
+              showBackToTop={preferences.showBackToTop}
+              shellSession={shellSession}
+              onRestartShell={startShell}
+            />
+          )}
+          {!showLocalShellDemo && (
+            <ConnectDevice options={demoTerminalProps} ticket={deviceTicket} visible={view === 'connect-device'} />
+          )}
+        </>
       )}
     />
   );

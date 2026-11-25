@@ -1,3 +1,7 @@
+.trigger[data-size='small'][data-icon-only='true'] {
+  --button-icon-size: var(--vd-sizing-20);
+}
+
 .body {
   display: flex;
   flex-direction: column;
