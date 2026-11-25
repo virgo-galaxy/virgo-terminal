@@ -1,6 +1,6 @@
 import { useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode, type RefObject } from 'react';
 import type { ExampleView } from '@/examples/types';
-import { usePlaygroundLocale } from './i18n/PlaygroundLocale';
+import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 
 const minGuideWidth = 360;
 const minGuideRatio = 0.34;

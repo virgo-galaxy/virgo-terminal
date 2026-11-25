@@ -3,7 +3,7 @@ import { CodeIcon, FileTextIcon, GithubIcon, LanguageIcon, MonitorIcon, MoonFill
 import { Button, Menu, SegmentedControl } from '@virgo-design/ui';
 import terminalLogo from '@/assets/virgo-terminal-logo.svg';
 import type { ExampleView } from '@/examples/types';
-import { usePlaygroundLocale } from './i18n/PlaygroundLocale';
+import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 
 export function Toolbar({ view, onSelectExample, children }: {
   view: ExampleView;

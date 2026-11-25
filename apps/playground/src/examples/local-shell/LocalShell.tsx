@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PlayFilledIcon } from '@virgo-design/icons';
 import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
-import { usePlaygroundLocale } from '@/app/i18n/PlaygroundLocale';
+import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import type { DemoTerminalProps } from '@/examples/types';
 import { useLocalShell } from './useLocalShell';
 

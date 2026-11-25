@@ -1,6 +1,6 @@
 import Markdown, { type Components } from 'react-markdown';
-import type { PlaygroundLocale } from '@/app/i18n/PlaygroundLocale';
 import type { ExampleView } from '@/examples/types';
+import type { PlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import enLogs from './en-US/simulated-logs.md?raw';
 import enTerminal from './en-US/terminal.md?raw';
 import zhLogs from './zh-CN/simulated-logs.md?raw';

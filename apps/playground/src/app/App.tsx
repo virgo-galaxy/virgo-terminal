@@ -4,11 +4,11 @@ import { LocalShell } from '@/examples/local-shell/LocalShell';
 import { useShellOptions } from '@/examples/local-shell/useShellOptions';
 import { SimulatedLogs } from '@/examples/simulated-logs/SimulatedLogs';
 import type { DemoTerminalProps, ExampleView } from '@/examples/types';
+import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import { TerminalPreferences } from '@/preferences/TerminalPreferences';
 import { defaultPreferences, fonts, themes, type TerminalPreferenceValues } from '@/preferences/preferences';
 import { PlaygroundLayout } from './PlaygroundLayout';
 import { Toolbar } from './Toolbar';
-import { usePlaygroundLocale } from './i18n/PlaygroundLocale';
 
 type ShellSession = { attempt: number; shellId: string };
 const ExampleGuide = lazy(() => import('@/guides/ExampleGuide'));
