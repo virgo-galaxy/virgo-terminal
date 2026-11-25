@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/coder/websocket"
@@ -16,11 +17,13 @@ const protocol = "virgo-terminal.v1"
 const approvalDenied = websocket.StatusCode(4001)
 
 type Server struct {
-	ctx     context.Context
-	origin  string
-	address string
-	pairing *pairing
-	approve func(context.Context, string) bool
+	ctx       context.Context
+	origin    string
+	address   string
+	pairing   *pairing
+	approve   func(context.Context, string) bool
+	clientsMu sync.Mutex
+	clients   sync.WaitGroup
 }
 
 func New(ctx context.Context, origin, address string, approve func(context.Context, string) bool) (*Server, string, error) {
@@ -32,6 +35,14 @@ func New(ctx context.Context, origin, address string, approve func(context.Conte
 }
 
 func (s *Server) Expired() bool { return s.pairing.expired() }
+
+// Wait drains the WebSocket handlers after the client cancels the server context.
+func (s *Server) Wait() {
+	// Let any request that checked the context before cancellation register first.
+	s.clientsMu.Lock()
+	s.clientsMu.Unlock()
+	s.clients.Wait()
+}
 
 type message struct {
 	Type string `json:"type"`
@@ -54,6 +65,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
+	s.clientsMu.Lock()
+	if s.ctx.Err() != nil {
+		s.clientsMu.Unlock()
+		http.Error(w, "Client is shutting down", http.StatusServiceUnavailable)
+		return
+	}
+	s.clients.Add(1)
+	s.clientsMu.Unlock()
+	defer s.clients.Done()
 
 	// The exact origin and host were checked above, including their ports.
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
@@ -158,7 +178,9 @@ func (s *Server) approvePairing(conn *websocket.Conn, start *message) bool {
 		return false
 	}
 	if !s.approve(approvalCtx, s.origin) || approvalCtx.Err() != nil {
-		_ = conn.Close(approvalDenied, "Connection was not approved")
+		if s.ctx.Err() == nil {
+			_ = conn.Close(approvalDenied, "Connection was not approved")
+		}
 		return false
 	}
 

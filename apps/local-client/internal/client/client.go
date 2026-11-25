@@ -59,14 +59,20 @@ func Run(playground string, printURL bool) error {
 			}
 		}
 	}()
+	serve := func() error {
+		err := server.Serve(listener)
+		stop()
+		handler.Wait()
+		if errors.Is(err, http.ErrServerClosed) {
+			return nil
+		}
+		return err
+	}
 	if printURL {
 		page.Fragment = fmt.Sprintf("connect-device=%d.%s", address.Port, key)
 		fmt.Println(page.String())
-	} else {
-		fmt.Printf("Waiting for a connection from %s\n", origin)
+		return serve()
 	}
-	if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
-		return err
-	}
-	return nil
+	fmt.Printf("Waiting for a connection from %s\n", origin)
+	return runDesktopClient(page.String(), stop, serve)
 }
