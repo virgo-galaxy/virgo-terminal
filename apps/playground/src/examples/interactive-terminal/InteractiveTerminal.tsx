@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import type { DemoTerminalProps } from '@/examples/types';
+import styles from '../examples.module.css';
 import { loginMessage, prompt } from './fixtures';
 
 export function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrollback }: DemoTerminalProps) {
@@ -15,7 +16,7 @@ export function InteractiveTerminal({ appearance, copyOnSelect, scrollbar, scrol
     <Terminal
       appearance={{ ...appearance, cursorBlink: true }}
       autoFit
-      className="demo-terminal"
+      className={styles.terminal!}
       copyOnSelect={copyOnSelect}
       ref={terminal}
       scrollbar={scrollbar}

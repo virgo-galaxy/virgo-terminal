@@ -6,7 +6,7 @@ import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import {
   defaultPreferences, fonts, historyLimits, scrollbarRadii, scrollbarWidths, sizes, themes, type TerminalPreferenceValues,
 } from './preferences';
-import './preferences.css';
+import styles from './preferences.module.css';
 
 const themeOptions = Object.keys(themes) as Array<keyof typeof themes>;
 
@@ -37,10 +37,10 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
             <Drawer.Title>{t('preferences.title')}</Drawer.Title>
             <Drawer.Close aria-label={t('preferences.close')} />
           </Drawer.Header>
-          <Drawer.Body className="preferences-body">
-            <section className="preferences-section" aria-labelledby="appearance-heading">
+          <Drawer.Body className={styles.body}>
+            <section className={styles.section} aria-labelledby="appearance-heading">
               <h3 id="appearance-heading">{t('preferences.appearance')}</h3>
-              <div className="preference-field">
+              <div className={styles.field}>
                 <span id="appearance-font">{t('preferences.font')}</span>
                 <Select size="small" value={font} onValueChange={(value) => onChange({ font: value as keyof typeof fonts })}>
                   <Select.Trigger aria-labelledby="appearance-font" />
@@ -51,7 +51,7 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
                   </Select.Content>
                 </Select>
               </div>
-              <div className="preference-field">
+              <div className={styles.field}>
                 <span id="appearance-size">{t('preferences.size')}</span>
                 <Select size="small" value={fontSize} onValueChange={(value) => onChange({ fontSize: value })}>
                   <Select.Trigger aria-labelledby="appearance-size" />
@@ -60,7 +60,7 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
                   </Select.Content>
                 </Select>
               </div>
-              <div className="preference-field">
+              <div className={styles.field}>
                 <span id="appearance-theme">{t('preferences.theme')}</span>
                 <Select size="small" value={theme} onValueChange={(value) => onChange({ theme: value as keyof typeof themes })}>
                   <Select.Trigger aria-labelledby="appearance-theme" />
@@ -71,9 +71,9 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
                   </Select.Content>
                 </Select>
               </div>
-              <div className="preferences-section scrollbar-preferences" role="group" aria-labelledby="scrollbar-heading">
+              <div className={`${styles.section} ${styles.scrollbar}`} role="group" aria-labelledby="scrollbar-heading">
                 <h4 id="scrollbar-heading">{t('preferences.scrollbar')}</h4>
-                <div className="preference-field">
+                <div className={styles.field}>
                   <span id="scrollbar-display">{t('preferences.display')}</span>
                   <Select size="small" value={scrollbarVisibility} onValueChange={(value) => onChange({ scrollbarVisibility: value as TerminalPreferenceValues['scrollbarVisibility'] })}>
                     <Select.Trigger aria-labelledby="scrollbar-heading scrollbar-display" />
@@ -83,7 +83,7 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
                     </Select.Content>
                   </Select>
                 </div>
-                <div className="preference-field">
+                <div className={styles.field}>
                   <span id="scrollbar-width">{t('preferences.width')}</span>
                   <Select size="small" value={scrollbarWidth} onValueChange={(value) => onChange({ scrollbarWidth: value })}>
                     <Select.Trigger aria-labelledby="scrollbar-heading scrollbar-width" />
@@ -92,7 +92,7 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
                     </Select.Content>
                   </Select>
                 </div>
-                <div className="preference-field">
+                <div className={styles.field}>
                   <span id="scrollbar-radius">{t('preferences.radius')}</span>
                   <Select size="small" value={scrollbarRadius} onValueChange={(value) => onChange({ scrollbarRadius: value })}>
                     <Select.Trigger aria-labelledby="scrollbar-heading scrollbar-radius" />
@@ -104,15 +104,15 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
               </div>
             </section>
             <Separator decorative />
-            <section className="preferences-section" aria-labelledby="settings-heading">
+            <section className={styles.section} aria-labelledby="settings-heading">
               <h3 id="settings-heading">{t('preferences.settings')}</h3>
-              <Switch className="preference-switch" checked={copyOnSelect} onCheckedChange={(checked) => onChange({ copyOnSelect: checked })}>
+              <Switch className={styles.switch!} checked={copyOnSelect} onCheckedChange={(checked) => onChange({ copyOnSelect: checked })}>
                 {t('preferences.copyOnSelect')}
               </Switch>
-              <Switch className="preference-switch" checked={showBackToTop} onCheckedChange={(checked) => onChange({ showBackToTop: checked })}>
+              <Switch className={styles.switch!} checked={showBackToTop} onCheckedChange={(checked) => onChange({ showBackToTop: checked })}>
                 {t('preferences.backToTopInLogs')}
               </Switch>
-              <div className="preference-field">
+              <div className={styles.field}>
                 <span id="history-label">{t('preferences.history')}</span>
                 <Select size="small" value={history} onValueChange={(value) => onChange({ history: value })}>
                   <Select.Trigger aria-labelledby="history-label" />
@@ -129,7 +129,7 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
               </div>
               {import.meta.env.DEV && (
                 <>
-                  <div className="preference-field">
+                  <div className={styles.field}>
                     <span id="local-shell-label">{t('preferences.shell')}</span>
                     <Select size="small" value={shellId} onValueChange={(value) => onChange({ shellId: value })}>
                       <Select.Trigger aria-labelledby="local-shell-label" aria-describedby="local-shell-hint" />
@@ -142,7 +142,7 @@ export function TerminalPreferences({ preferences, shellOptions, onChange, onRes
                       </Select.Content>
                     </Select>
                   </div>
-                  <p id="local-shell-hint" className="shell-preference-hint">{t('preferences.shellHint')}</p>
+                  <p id="local-shell-hint" className={styles.shellHint}>{t('preferences.shellHint')}</p>
                 </>
               )}
             </section>

@@ -6,7 +6,7 @@ import enTerminal from './en-US/terminal.md?raw';
 import zhLogs from './zh-CN/simulated-logs.md?raw';
 import zhTerminal from './zh-CN/terminal.md?raw';
 import { GuideCodeBlock } from './GuideCodeBlock';
-import './guide.css';
+import styles from './guide.module.css';
 
 type GuideView = Exclude<ExampleView, 'shell'>;
 
@@ -21,7 +21,7 @@ export default function ExampleGuide({ view, locale }: {
   locale: PlaygroundLocale;
 }) {
   return (
-    <article className="example-guide" lang={locale}>
+    <article className={styles.guide} lang={locale}>
       <Markdown components={markdownComponents}>{guides[locale][view]}</Markdown>
     </article>
   );

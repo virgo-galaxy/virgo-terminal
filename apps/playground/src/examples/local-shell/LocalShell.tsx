@@ -4,6 +4,7 @@ import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
 import type { DemoTerminalProps } from '@/examples/types';
+import styles from '../examples.module.css';
 import { useLocalShell } from './useLocalShell';
 
 export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, scrollback, shellId, visible }: DemoTerminalProps & {
@@ -21,11 +22,11 @@ export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, scr
   }, [ready, visible]);
 
   return (
-    <div className="demo-terminal local-shell" hidden={!visible}>
+    <div className={styles.localShell} hidden={!visible}>
       <Terminal
         appearance={{ ...appearance, cursorBlink: true }}
         autoFit
-        className="local-shell-terminal"
+        className={styles.localShellTerminal!}
         copyOnSelect={copyOnSelect}
         ref={terminal}
         scrollbar={scrollbar}
@@ -35,9 +36,9 @@ export function LocalShell({ appearance, copyOnSelect, onRestart, scrollbar, scr
         onData={sendInput}
       />
       {closed && (
-        <div className="local-shell-actions">
+        <div className={styles.localShellActions}>
           <Button
-            className="start-shell-button"
+            className={styles.startShellButton}
             size="small"
             variant="primary"
             leadingIcon={<PlayFilledIcon />}

@@ -4,6 +4,7 @@ import { Button, Menu, SegmentedControl } from '@virgo-design/ui';
 import terminalLogo from '@/assets/virgo-terminal-logo.svg';
 import type { ExampleView } from '@/examples/types';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
+import styles from './playground.module.css';
 
 export function Toolbar({ view, onSelectExample, children }: {
   view: ExampleView;
@@ -23,11 +24,11 @@ export function Toolbar({ view, onSelectExample, children }: {
   }
 
   return (
-    <div className="toolbar">
+    <div className={styles.toolbar}>
       <img src={terminalLogo} alt="Virgo Terminal" width={24} height={24} />
       <SegmentedControl
         aria-label={t('toolbar.examples')}
-        className="toolbar-examples"
+        className={styles.toolbarExamples!}
         size="small"
         variant="soft"
         motion="slide"
@@ -40,7 +41,7 @@ export function Toolbar({ view, onSelectExample, children }: {
           <SegmentedControl.Item value="shell" icon={<MonitorIcon />}>{t('toolbar.shell')}</SegmentedControl.Item>
         )}
       </SegmentedControl>
-      <div className="toolbar-actions">
+      <div className={styles.toolbarActions}>
         <Button
           type="button"
           size="small"

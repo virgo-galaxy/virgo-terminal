@@ -1,0 +1,43 @@
+.terminal,
+.simulatedLogs,
+.localShell {
+  height: 100%;
+}
+
+.simulatedLogs {
+  position: relative;
+}
+
+.simulatedLogs > .terminal {
+  isolation: isolate;
+}
+
+.logsBackToTop {
+  position: absolute;
+  z-index: 1;
+  inset-inline-end: var(--vd-spacing-16);
+  inset-block-end: var(--vd-spacing-8);
+}
+
+.localShell:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+
+.localShellTerminal {
+  flex: 1;
+  min-block-size: 0;
+}
+
+.localShellActions {
+  display: flex;
+  justify-content: flex-end;
+  padding-block-start: var(--vd-spacing-8);
+}
+
+.startShellButton {
+  --vd-brand-primary: var(--vd-status-success-solid);
+  --vd-brand-primary-hover: color-mix(in srgb, var(--vd-status-success-solid) 92%, var(--vd-status-success-foreground));
+  --vd-brand-primary-active: color-mix(in srgb, var(--vd-status-success-solid) 85%, var(--vd-status-success-foreground));
+  --vd-brand-foreground: var(--vd-status-success-on-solid);
+}

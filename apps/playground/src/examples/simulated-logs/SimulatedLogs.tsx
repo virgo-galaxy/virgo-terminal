@@ -4,6 +4,7 @@ import { Button } from '@virgo-design/ui';
 import { Terminal, type TerminalHandle } from '@virgo-terminal/react';
 import type { DemoTerminalProps } from '@/examples/types';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
+import styles from '../examples.module.css';
 import { formatLogLine } from './lib/formatLogLine';
 
 const initialLogCount = 80;
@@ -27,11 +28,11 @@ export function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback,
   }, []);
 
   return (
-    <div className="simulated-logs">
+    <div className={styles.simulatedLogs}>
       <Terminal
         appearance={appearance}
         autoFit
-        className="demo-terminal"
+        className={styles.terminal!}
         copyOnSelect={copyOnSelect}
         readOnly
         ref={terminal}
@@ -52,7 +53,7 @@ export function SimulatedLogs({ appearance, copyOnSelect, scrollbar, scrollback,
       {showBackToTop && canScrollUp && (
         <Button
           type="button"
-          className="logs-back-to-top"
+          className={styles.logsBackToTop}
           variant="secondary"
           size="small"
           iconOnly

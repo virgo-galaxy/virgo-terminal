@@ -10,7 +10,7 @@ import { TerminalPreferences } from '@/preferences/TerminalPreferences';
 import { defaultPreferences, fonts, themes, type TerminalPreferenceValues } from '@/preferences/preferences';
 import { SplitView } from './SplitView';
 import { Toolbar } from './Toolbar';
-import './playground.css';
+import styles from './playground.module.css';
 
 type ShellSession = { attempt: number; shellId: string };
 const ExampleGuide = lazy(() => import('@/guides/ExampleGuide'));
@@ -51,7 +51,7 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
   }
 
   return (
-    <Layout className="playground">
+    <Layout className={styles.playground!}>
       <Layout.Header height="var(--vd-sizing-28)" paddingInline={0}>
         <Toolbar view={view} onSelectExample={selectExample}>
           <TerminalPreferences
@@ -62,11 +62,11 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
           />
         </Toolbar>
       </Layout.Header>
-      <Layout.Content className="playground-content">
+      <Layout.Content className={styles.playgroundContent!}>
         <SplitView
           containerRef={splitView}
           terminal={(
-            <div className="terminal-frame" style={{ backgroundColor: appearance.theme.background }}>
+            <div className={styles.terminalFrame} style={{ backgroundColor: appearance.theme.background }}>
               {view === 'terminal' && <InteractiveTerminal {...demoTerminalProps} />}
               {view === 'logs' && <SimulatedLogs {...demoTerminalProps} showBackToTop={preferences.showBackToTop} />}
               {import.meta.env.DEV && shellSession && (
@@ -81,8 +81,8 @@ export function Playground({ initialFont }: { initialFont: TerminalPreferenceVal
             </div>
           )}
           guide={view !== 'shell' && (
-            <div className="guide-frame" id="playground-guide" key={view}>
-              <Suspense fallback={<p className="guide-loading" role="status">{t('guide.loading')}</p>}>
+            <div className={styles.guideFrame} id="playground-guide" key={view}>
+              <Suspense fallback={<p className={styles.guideLoading} role="status">{t('guide.loading')}</p>}>
                 <ExampleGuide view={view} locale={locale} />
               </Suspense>
             </div>

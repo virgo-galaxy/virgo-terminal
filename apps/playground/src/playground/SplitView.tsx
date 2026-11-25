@@ -1,5 +1,6 @@
 import { useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode, type RefObject } from 'react';
 import { usePlaygroundLocale } from '@/i18n/PlaygroundLocale';
+import styles from './playground.module.css';
 
 const minGuideWidth = 360;
 const minGuideRatio = 0.34;
@@ -55,7 +56,7 @@ export function SplitView({ containerRef, terminal, guide }: {
 
   return (
     <div
-      className="split-view"
+      className={styles.splitView}
       data-single-pane={!guide || undefined}
       ref={containerRef}
       style={{
@@ -70,7 +71,7 @@ export function SplitView({ containerRef, terminal, guide }: {
       {guide && (
         <>
           <div
-            className="pane-divider"
+            className={styles.paneDivider}
             role="separator"
             tabIndex={0}
             aria-orientation="vertical"
