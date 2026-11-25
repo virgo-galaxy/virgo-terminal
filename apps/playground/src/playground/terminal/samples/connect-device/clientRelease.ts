@@ -2,6 +2,11 @@ const repository = 'virgo-galaxy/virgo-terminal';
 const clientTag = /^local-client-v\d+\.\d+\.\d+$/;
 const pageSize = 100;
 
+export interface ClientDownload {
+  url: string;
+  version: string;
+}
+
 interface Release {
   tag_name: string;
   draft: boolean;
@@ -9,7 +14,7 @@ interface Release {
   assets: { name: string; state: string }[];
 }
 
-export async function getLatestClientDownload(filename: string): Promise<string | null> {
+export async function getLatestClientDownload(filename: string): Promise<ClientDownload | null> {
   const signal = AbortSignal.timeout(10_000);
   let latest: Release | undefined;
 
@@ -32,5 +37,8 @@ export async function getLatestClientDownload(filename: string): Promise<string 
 
   if (!latest?.assets.some((asset) => asset.name === filename && asset.state === 'uploaded')) return null;
 
-  return `https://github.com/${repository}/releases/download/${latest.tag_name}/${encodeURIComponent(filename)}`;
+  return {
+    url: `https://github.com/${repository}/releases/download/${latest.tag_name}/${encodeURIComponent(filename)}`,
+    version: latest.tag_name.slice('local-client-'.length),
+  };
 }

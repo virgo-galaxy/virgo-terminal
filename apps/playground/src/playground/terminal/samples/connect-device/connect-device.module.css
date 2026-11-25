@@ -5,7 +5,7 @@
 
 .setup {
   box-sizing: border-box;
-  max-inline-size: 40rem;
+  max-inline-size: 48rem;
   margin-inline: auto;
   padding: clamp(var(--vd-spacing-24), 7vh, var(--vd-spacing-64)) var(--vd-spacing-16);
 }
@@ -23,9 +23,8 @@
 }
 
 .downloads {
-  margin: 0 0 var(--vd-spacing-12);
+  margin: var(--vd-spacing-24) 0 var(--vd-spacing-12);
   padding: 0;
-  border-block-end: 1px solid var(--vd-border-default);
   list-style: none;
 }
 
@@ -34,21 +33,23 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--vd-spacing-8);
-  padding: var(--vd-spacing-12) 0;
+  gap: var(--vd-spacing-12);
+  padding-block-start: var(--vd-spacing-16);
   border-block-start: 1px solid var(--vd-border-default);
 }
 
 .platform {
   display: inline-flex;
   align-items: center;
-  gap: var(--vd-spacing-8);
+  gap: var(--vd-spacing-12);
+  font-size: var(--vd-font-size-20);
+  font-weight: var(--vd-font-weight-600);
 }
 
 .platformIcon {
   flex: none;
-  inline-size: var(--vd-sizing-16);
-  block-size: var(--vd-sizing-16);
+  inline-size: var(--vd-sizing-28);
+  block-size: var(--vd-sizing-28);
 }
 
 .macHelp {
