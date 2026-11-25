@@ -53,7 +53,10 @@ export function ConnectDevice({ options, ticket, visible }: {
   const hasLaunchTicket = status === 'idle' && ticket !== null;
   const canConnect = hasLaunchTicket || download !== null;
   const instructions = download ? 'connectDevice.instructions' : 'connectDevice.unsupportedPlatform';
-  const macOpenCommand = `# ${t('connectDevice.macRemoveQuarantineStep')}
+  const macOpenCommand = `# ${t('connectDevice.macExtractStep')}
+ditto -x -k "$HOME/Downloads/${downloads.macos.filename}" "$HOME/Downloads"
+
+# ${t('connectDevice.macRemoveQuarantineStep')}
 xattr -dr com.apple.quarantine "$HOME/Downloads/Virgo Terminal Client.app"
 
 # ${t('connectDevice.macLaunchStep')}
