@@ -51,6 +51,38 @@
   block-size: var(--vd-sizing-16);
 }
 
+.macHelp {
+  flex-basis: 100%;
+  min-inline-size: 0;
+  color: var(--vd-text-secondary);
+  font-size: var(--vd-font-size-13);
+}
+
+.macHelp summary {
+  inline-size: fit-content;
+  cursor: pointer;
+}
+
+.macHelp p,
+.macHelp pre {
+  margin: var(--vd-spacing-8) 0 0;
+}
+
+.macHelp a {
+  color: inherit;
+}
+
+.macHelp pre {
+  overflow-x: auto;
+  padding: var(--vd-spacing-8);
+  border: 1px solid var(--vd-border-default);
+  border-radius: var(--vd-shape-radius-4);
+}
+
+.macHelp code {
+  font-family: var(--vd-font-family-mono);
+}
+
 .availability {
   font-size: var(--vd-font-size-13);
 }

@@ -13,13 +13,14 @@ const downloads = [
   { label: 'connectDevice.macos', filename: 'virgo-terminal-macos-universal.zip', icon: AppleIcon },
   { label: 'connectDevice.windows', filename: 'virgo-terminal-windows-x64.exe', icon: WindowsIcon },
 ] as const;
+const macOpenCommand = 'xattr -dr com.apple.quarantine "$HOME/Downloads/Virgo Terminal Client.app" && open "$HOME/Downloads/Virgo Terminal Client.app"';
 
 export function ConnectDevice({ options, ticket, visible }: {
   options: DemoTerminalProps;
   ticket: DeviceTicket | null;
   visible: boolean;
 }) {
-  const { t } = usePlaygroundLocale();
+  const { locale, t } = usePlaygroundLocale();
   const terminal = useRef<TerminalHandle>(null);
   const { status, connect, start, sendInput, sendSize } = useDeviceConnection(ticket, terminal);
   const [downloading, setDownloading] = useState<string | null>(null);
@@ -80,6 +81,19 @@ export function ConnectDevice({ options, ticket, visible }: {
                     >
                       {t(downloading === filename ? 'connectDevice.checkingRelease' : 'connectDevice.download')}
                     </Button>
+                    {label === 'connectDevice.macos' && (
+                      <details className={styles.macHelp}>
+                        <summary>{t('connectDevice.macOpenHelp')}</summary>
+                        <p>
+                          {t('connectDevice.macOpenSettings')}{' '}
+                          <a href={`https://support.apple.com/${locale.toLowerCase()}/102445`} target="_blank" rel="noreferrer">
+                            {t('connectDevice.macOpenAppleSupport')}
+                          </a>
+                        </p>
+                        <p>{t('connectDevice.macOpenCommand')}</p>
+                        <pre><code>{macOpenCommand}</code></pre>
+                      </details>
+                    )}
                   </li>
                 ))}
               </ul>
