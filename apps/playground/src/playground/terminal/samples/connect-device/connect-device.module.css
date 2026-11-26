@@ -58,7 +58,7 @@
   block-size: var(--vd-sizing-28);
 }
 
-.macHelp {
+.openHelp {
   flex-basis: 100%;
   min-inline-size: 0;
   padding-block-end: var(--vd-spacing-12);
@@ -67,28 +67,28 @@
   font-size: var(--vd-font-size-13);
 }
 
-.macHelp summary {
+.openHelp summary {
   inline-size: fit-content;
   cursor: pointer;
 }
 
-.macHelp p,
-.macHelp pre {
+.openHelp p,
+.openHelp pre {
   margin: var(--vd-spacing-8) 0 0;
 }
 
-.macHelp a {
+.openHelp a {
   color: inherit;
 }
 
-.macHelp pre {
+.openHelp pre {
   overflow-x: auto;
   padding: var(--vd-spacing-8);
   border: 1px solid var(--vd-border-default);
   border-radius: var(--vd-shape-radius-4);
 }
 
-.macHelp code {
+.openHelp code {
   font-family: var(--vd-font-family-mono);
 }
 

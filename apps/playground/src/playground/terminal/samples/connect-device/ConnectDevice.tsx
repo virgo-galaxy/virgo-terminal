@@ -146,28 +146,35 @@ open "$HOME/Downloads/Virgo Terminal Client.app"`;
                     : t('connectDevice.downloadVersion').replace('{version}', versionHint.version)}
                 </Tooltip.Content>
               </Tooltip>
-              {platform === 'macos' && (
-                <details
-                  className={styles.macHelp}
-                  onToggle={(event) => {
-                    if (event.currentTarget.open) setMacHelpOpened(true);
-                  }}
-                >
-                  <summary>{t('connectDevice.macOpenHelp')}</summary>
-                  <p>
-                    {renderInstruction(t('connectDevice.macOpenSettings'))}{' '}
-                    <a href={`https://support.apple.com/${locale.toLowerCase()}/102445`} target="_blank" rel="noreferrer">
-                      {t('connectDevice.macOpenAppleSupport')}
-                    </a>
-                  </p>
-                  <p>{t('connectDevice.macOpenCommand')}</p>
-                  {macHelpOpened && (
-                    <Suspense fallback={<pre><code>{macOpenCommand}</code></pre>}>
-                      <HighlightedCodeBlock key={macOpenCommand} code={macOpenCommand} language="bash" />
-                    </Suspense>
-                  )}
-                </details>
-              )}
+              <details
+                className={styles.openHelp}
+                onToggle={(event) => {
+                  if (platform === 'macos' && event.currentTarget.open) setMacHelpOpened(true);
+                }}
+              >
+                <summary>{t('connectDevice.openHelp')}</summary>
+                {platform === 'macos' ? (
+                  <>
+                    <p>
+                      {renderInstruction(t('connectDevice.macOpenSettings'))}{' '}
+                      <a href={`https://support.apple.com/${locale.toLowerCase()}/102445`} target="_blank" rel="noreferrer">
+                        {t('connectDevice.macOpenAppleSupport')}
+                      </a>
+                    </p>
+                    <p>{t('connectDevice.macOpenCommand')}</p>
+                    {macHelpOpened && (
+                      <Suspense fallback={<pre><code>{macOpenCommand}</code></pre>}>
+                        <HighlightedCodeBlock key={macOpenCommand} code={macOpenCommand} language="bash" />
+                      </Suspense>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p>{renderInstruction(t('connectDevice.windowsOpenExecutable').replace('{filename}', download.filename))}</p>
+                    <p>{renderInstruction(t('connectDevice.windowsOpenSmartScreen'))}</p>
+                  </>
+                )}
+              </details>
             </li>
           </ul>
           {downloadError && (
