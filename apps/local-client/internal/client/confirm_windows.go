@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"syscall"
+
+	"golang.org/x/sys/windows"
 )
 
 func confirmConnection(ctx context.Context, origin string, remember bool) bool {
@@ -21,6 +23,6 @@ exit 1`
 	powershell := filepath.Join(os.Getenv("SystemRoot"), "System32", "WindowsPowerShell", "v1.0", "powershell.exe")
 	cmd := exec.CommandContext(ctx, powershell, "-NoProfile", "-NonInteractive", "-Command", dialog)
 	cmd.Env = append(os.Environ(), "VIRGO_TERMINAL_ORIGIN="+origin, "VIRGO_TERMINAL_REMEMBER="+strconv.FormatBool(remember))
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: windows.CREATE_NO_WINDOW}
 	return cmd.Run() == nil
 }

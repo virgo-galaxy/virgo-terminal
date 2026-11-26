@@ -19,6 +19,16 @@ pnpm dev
 
 React component code and its tests live in [packages/react](packages/react). Demos and local shell integration live in [apps/playground](apps/playground).
 
+## Build the Windows desktop client
+
+From [apps/local-client](apps/local-client), run `go generate .` to embed the app icon and Windows manifest. Then build the x64 desktop executable. Use the GUI linker option so launching the app from Explorer opens its native window.
+
+```powershell
+go generate .
+$env:GOARCH = 'amd64'
+go build -ldflags '-H=windowsgui' -o dist/virgo-terminal-windows-x64.exe .
+```
+
 ## Verify and open a pull request
 
 Run the same checks used by CI.

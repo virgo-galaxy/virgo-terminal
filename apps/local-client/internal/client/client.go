@@ -18,7 +18,13 @@ import (
 
 const connectionPort = 43127 // Keep in sync with the Playground's device port.
 
-func Run(playground string, printURL bool) error {
+func Run(playground string, printURL bool) (runErr error) {
+	defer func() {
+		if runErr != nil && !printURL {
+			reportDesktopError(runErr)
+		}
+	}()
+
 	page, err := parsePlaygroundURL(playground)
 	if err != nil {
 		return err

@@ -8,3 +8,4 @@ coverage/
 !.env.example
 *.tgz
 .impeccable/
+/apps/local-client/rsrc_windows_amd64.syso
